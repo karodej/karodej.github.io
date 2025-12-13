@@ -123,6 +123,24 @@
             cursor: help; 
         }
         
+        /* === ANIMOWANY, ZMIGOTANY PODZIAŁ SEKCJI (HR) - NOWY KOD === */
+
+        @keyframes hr-flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        hr {
+            border: none;
+            height: 3px;
+            margin: 40px auto;
+            width: 70%;
+            background: linear-gradient(90deg, transparent 0%, #CC33FF 50%, transparent 100%);
+            box-shadow: 0 0 10px #CC33FF, 0 0 20px #FF66CC;
+            animation: hr-flicker 2s infinite alternate;
+            border-radius: 1.5px;
+        }
+
         /* === STYL PRZYCISKU === */
         .neon-button {
             display: block;
@@ -533,7 +551,7 @@
             </p>
         </section>
         
-        <section id="galeria" class="content-box">
+        <hr> <section id="galeria" class="content-box">
             <h2 class="neon-text">📸 Galeria Wspomnień</h2>
             <div class="gallery-grid">
                 <div class="gallery-item"><img src="zdjecie_1.jpg" alt="Wspomnienie 1"></div>
@@ -552,7 +570,7 @@
             </div>
         </section>
 
-        <section id="gify" class="content-box">
+        <hr> <section id="gify" class="content-box">
             <h2 class="neon-text">💾 Nasze najlepsze gify😎</h2>
             <p style="text-align: center; color: #F0F0FF; margin-bottom: 25px;">
                 
@@ -562,7 +580,8 @@
                 <div class="gallery-item"><img src="gif_2.gif" alt="Animowany moment 2"></div>
                 </div>
         </section>
-        <section id="video" class="content-box">
+
+        <hr> <section id="video" class="content-box">
             <h2 class="neon-text">🎥 NA PAMIĄTKĘ</h2>
             <p style="text-align: center; color: #F0F0FF; margin-bottom: 25px;">
                 Film, który streszcza tysiąc wspomnień.
