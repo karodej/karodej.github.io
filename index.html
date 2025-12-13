@@ -98,15 +98,15 @@
             /* WŁĄCZONA ANIMACJA PULSACJI */
             animation: neon-pulse 10s infinite alternate; 
             
-            text-align: center; /* ZMIANA: Wyśrodkowanie elementów wewnątrz, w tym h2 */
+            text-align: center; /* ZMIANA: Wyśrodkowuje h2 i jego dekoracje */
             line-height: 1.6;
-            position: relative; 
+            position: relative; /* Dodane: Umożliwia pozycjonowanie absolutne dekoracji H2 */
         }
 
         .content-box p {
             color: #F0F0FF; 
             font-size: 1.1em;
-            text-align: justify;
+            text-align: justify; /* Zapewnia, że tekst wewnątrz paragrafów jest wyjustowany */
             /* Cień dla cyfrowego wyglądu */
             text-shadow: 0 0 1px #F0F0FF; 
         }
@@ -257,7 +257,7 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 10; /* Teraz jest nad tłem, ale pod główną treścią */
+            z-index: 10; 
         }
 
         .snowflake {
@@ -316,7 +316,8 @@
         .show-btn {
             opacity: 1 !important;
         }
-
+        
+        
         /* ====================================================
         === DODANE DLA ŚWIĄTECZNYCH DEKORACJI (START) === 
         ====================================================
@@ -378,8 +379,8 @@
         /* === DEKORACJE SEKCJI (MALE ŚWIATEŁKA PRZY H2) === */
         
         .content-box h2 {
-            position: relative; /* Umożliwia pozycjonowanie absolutne dekoracji */
-            display: inline-block; /* Umożliwia dopasowanie szerokości do tekstu, ale pozwala na wyśrodkowanie */
+            position: relative; 
+            display: inline-block; /* KLUCZOWE: Umożliwia wyśrodkowanie H2 za pomocą text-align: center na rodzicu i pozycjonowanie dekoracji */
             padding: 0 15px;
         }
 
@@ -419,7 +420,6 @@
         === DODANE DLA ŚWIĄTECZNYCH DEKORACJI (KONIEC) === 
         ====================================================
         */
-
     </style>
 </head>
 <body>
@@ -460,6 +460,7 @@
         
         <p id="neon-clock" class="neon-text"></p>
         
+        <p id="visit-counter" class="neon-text" style="font-size: 1.2em; margin-top: 10px;"></p>
         <p class="neon-alert">
             Wiesz co z tym zrobić😎 👇
         </p>
@@ -474,10 +475,10 @@
 
 
     <main>
-        
+	
         <section id="o-nas" class="content-box">
             <h2 class="neon-text">✨ WSTĘP</h2>
-            <p style="text-align: justify;">
+            <p>
                 Jeśli kiedykolwiek będziesz miała zły dzień, kliknij suwak na górze i obejrzyj naszą galerię. Jesteśmy lepsi razem.
             </p>
         </section>
@@ -502,7 +503,7 @@
         </section>
 
         <section id="gify" class="content-box">
-             <h2 class="neon-text">💾 Nasze najlepsze gify😎</h2>
+            <h2 class="neon-text">💾 Nasze najlepsze gify😎</h2>
             <p style="text-align: center; color: #F0F0FF; margin-bottom: 25px;">
                 
             </p>
@@ -512,7 +513,7 @@
                 </div>
         </section>
         <section id="video" class="content-box">
-            <h2 class="neon-text">🎥 Na pamiątkę!</h2>
+            <h2 class="neon-text">🎥 NA PAMIĄTKĘ</h2>
             <p style="text-align: center; color: #F0F0FF; margin-bottom: 25px;">
                 Film, który streszcza tysiąc wspomnień.
             </p>
@@ -523,7 +524,8 @@
                 </a>
             </div>
         </section>
-        </main>
+
+    </main>
 
     <footer>
         <p class="neon-text">Stworzone z miłością i fioletowym blaskiem.</p>
@@ -541,7 +543,8 @@
     <script>
         
         // === SKRYPT DO ANIMACJI TYTUŁU STRONY ===
-        const titleOriginal = document.title; 
+        // Używamy bieżącego tytułu i dodajemy drugi na zmianę
+        const titleOriginal = document.title; // "NAJLEPSZE DUO"
         const titleAnimated = "TO DOPIERO POCZĄTEK????????"; 
         let isAnimatedTitle = false;
 
@@ -554,20 +557,52 @@
             isAnimatedTitle = !isAnimatedTitle;
         }
 
+        // Zmienia tytuł co 2 sekundy (2000 ms)
         setInterval(animateTitle, 2000);
+        // =======================================
         
         
         // === SKRYPT DO CYFROROWEGO ZEGARA ===
         function updateClock() {
             const now = new Date();
             
+            // Formatowanie czasu (HH:MM:SS) i daty
             const timeString = now.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
             const dateString = now.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric' });
             
+            // Wyświetlanie: [DATA] // [CZAS]
             document.getElementById('neon-clock').textContent = `[${dateString}] // [${timeString}]`;
         }
         
+        // Aktualizowanie zegara co sekundę
         setInterval(updateClock, 1000); 
+
+        // === SKRYPT DO LICZNIKA WIZYT (DODANY) ===
+        function initVisitCounter() {
+            // Nazwa klucza w Local Storage
+            const storageKey = 'duoVisitCount'; 
+            let count = 0;
+            
+            // 1. Sprawdź, czy klucz istnieje
+            const storedCount = localStorage.getItem(storageKey);
+
+            if (storedCount) {
+                // Jeśli istnieje, konwertuj na liczbę i zwiększ
+                count = parseInt(storedCount, 10) + 1;
+            } else {
+                // Jeśli nie istnieje (pierwsza wizyta), ustaw na 1
+                count = 1;
+            }
+
+            // 2. Zapisz nową wartość w Local Storage
+            localStorage.setItem(storageKey, count);
+
+            // 3. Wyświetl wynik na stronie z nowym tekstem
+            const counterElement = document.getElementById('visit-counter');
+            if (counterElement) {
+                counterElement.innerHTML = `🌟 TWÓJ LICZNIK WSPOMNIEŃ: <span style="color: #FF66CC;">${count}</span> 🌟`;
+            }
+        }
 
         // === SKRYPT DO STEROWANIA AUDIO ===
         var isPlaying = false; 
@@ -597,6 +632,7 @@
         window.onscroll = function() {scrollFunction()};
         
         function scrollFunction() {
+            // Pokaż przycisk, jeśli przewinięto więcej niż 200 pikseli
             if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
                 backToTopButton.classList.add('show-btn');
             } else {
@@ -623,7 +659,7 @@
 
                 // Losowy czas trwania opadania (od 10s do 30s)
                 const fallDuration = Math.random() * 20 + 10; 
-                snowflake.style.animationDuration = `${fallDuration}s, ${fallDuration / 4}s`; 
+                snowflake.style.animationDuration = `${fallDuration}s, ${fallDuration / 4}s`; // Podział animacji
 
                 // Losowe opóźnienie animacji
                 snowflake.style.animationDelay = `-${Math.random() * fallDuration}s, -${Math.random() * fallDuration}s`;
@@ -632,13 +668,13 @@
             }
         }
 
-        // Inicjalizacja: wywołaj wszystkie funkcje startowe
+        // Inicjalizacja: wywołaj wszystkie funkcje startowe (ZAKTUALIZOWANE)
         window.onload = function() {
              setVolume(document.getElementById('volume-slider').value); 
              generateSnowflakes(50); // Generuje 50 płatków
              updateClock(); // Ustawia zegar od razu
+             initVisitCounter(); // INICJALIZUJE LICZNIK WIZYT
         };
     </script>
 </body>
 </html>
-
