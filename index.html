@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NAJLEPSZE DUO</title>
+    
+    <style>
+        /* WSTĘPNE ZEROWANIE MARGINESÓW I PADDINGÓW */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif; 
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+        /* === PŁYNNE PRZEWIJANIE (Smooth Scroll) === */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* GŁÓWNY STYL DLA EFEKTU NEONOWEGO TŁA */
+        body {
+            color: #CC33FF; 
+            background-color: #000000;
+            /* !!!!! WAŻNE: ZMIEŃ NA RZECZYWISTĄ NAZWĘ TWOJEGO PLIKU TŁA !!!!! */
+            background-image: url('moje_tlo_miasto.jpg'); 
+            background-size: cover;
+            background-attachment: fixed; 
+            text-align: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* EFEKT WIZUALNY NA TLE ZDJĘCIA DLA POPRAWY CZYTELNOŚCI */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7); 
+            z-index: -1; 
+        }
+
+        
+        /* === ANIMACJE TEKSTU === */
+        /* EFEKT GLITCH/FLICKER DLA TYTUŁU GŁÓWNEGO */
+        @keyframes flicker {
+            0%, 18%, 22%, 25%, 53%, 57%, 100% {
+                text-shadow: 0 0 4px #fff, 0 0 11px #fff, 0 0 19px #CC33FF, 0 0 40px #CC33FF, 0 0 80px #CC33FF;
+                opacity: 1;
+            }
+            20%, 24%, 55% {        
+                text-shadow: none;
+                opacity: 0.8;
+            }
+        }
+        
+        header h1 {
+            font-size: 3em;
+            animation: flicker 4s infinite alternate;
+            margin-bottom: 5px; 
+        }
+        
+        /* NEONOWY BLASK DLA TEKSTU I NAGŁÓWKÓW */
+        h1, h2, .neon-text {
+            text-shadow: 0 0 5px #E66FFF, 0 0 15px #E66FFF, 0 0 40px rgba(230, 111, 255, 0.9);
+            color: #FFFFFF; 
+            font-weight: 700;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+        }
+        
+        /* === STYLA KONTENERÓW I RAMKÓW Z ANIMACJĄ PULSACJI === */
+        @keyframes neon-pulse {
+            0% { border-color: #CC33FF; box-shadow: 0 0 15px #CC33FF; }
+            33% { border-color: #FF66CC; box-shadow: 0 0 15px #FF66CC; }
+            66% { border-color: #00FFFF; box-shadow: 0 0 15px #00FFFF; }
+            100% { border-color: #CC33FF; box-shadow: 0 0 15px #CC33FF; }
+        }
+
+        header, main, footer {
+            margin: 20px auto;
+            max-width: 900px;
+        }
+
+        .content-box {
+            background-color: rgba(0, 0, 15, 0.95); 
+            border: 2px solid #CC33FF; 
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            
+            /* WŁĄCZONA ANIMACJA PULSACJI */
+            animation: neon-pulse 10s infinite alternate; 
+            
+            text-align: left;
+            line-height: 1.6;
+        }
+
+        .content-box p {
+            color: #F0F0FF; 
+            font-size: 1.1em;
+            text-align: justify;
+            /* Cień dla cyfrowego wyglądu */
+            text-shadow: 0 0 1px #F0F0FF; 
+        }
+        
+        /* === STYL PRZYCISKU === */
+        .neon-button {
+            display: block;
+            width: fit-content;
+            margin: 20px auto 0 auto;
+            padding: 15px 30px;
+            text-decoration: none;
+            font-size: 1.3em;
+            font-weight: 700;
+            border: 3px solid #CC33FF; 
+            color: #CC33FF; 
+            border-radius: 50px;
+            background-color: rgba(204, 51, 255, 0.1); 
+            box-shadow: 0 0 10px #CC33FF, 0 0 20px rgba(204, 51, 255, 0.7);
+            text-shadow: 0 0 5px #CC33FF;
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+        
+        .neon-button:hover {
+            background-color: rgba(204, 51, 255, 0.3);
+            box-shadow: 0 0 20px #CC33FF, 0 0 40px rgba(204, 51, 255, 1);
+            transform: scale(1.05);
+        }
+        
+        /* GALERIA i GIF ARCHIVE używają tej samej siatki */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+            gap: 20px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 5px;
+            border: 1px solid #CC33FF;
+            box-shadow: 0 0 8px #CC33FF;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+        
+        /* ULEPSZENIE HOVERA DLA ZDJĘĆ i GIF-ów (Podwójny blask) */
+        .gallery-item img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px #00FFFF, 0 0 30px #CC33FF; 
+        }
+        
+        /* STOPKA */
+        footer p {
+            padding: 10px 0;
+            font-size: 0.9em;
+        }
+
+        /* STYLIZACJA ALERTU DLA KAROLINY */
+        .neon-alert {
+            color: #FF66CC; 
+            text-shadow: 0 0 5px #FF66CC, 0 0 10px #FF66CC;
+            font-size: 1.1em;
+            font-weight: 700;
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px dashed rgba(255, 102, 204, 0.5);
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        /* STYL DLA KONTROLKI GŁOŚNOŚCI */
+        .volume-control-container {
+            margin: 15px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 80%;
+            max-width: 300px;
+            gap: 10px;
+        }
+
+        #volume-slider {
+            width: 100%;
+            -webkit-appearance: none;
+            height: 8px;
+            border-radius: 5px;
+            background: #FF66CC; 
+            box-shadow: 0 0 5px #FF66CC;
+            cursor: pointer;
+        }
+
+        /* Styl dla kciuka (rączki) suwaka */
+        #volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #FFFFFF; 
+            border: 2px solid #CC33FF;
+            box-shadow: 0 0 10px #CC33FF;
+            transition: background 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .volume-label {
+            color: #F0F0FF;
+            font-size: 1.1em;
+            text-shadow: 0 0 3px #F0F0FF;
+        }
+        
+        /* === Efekt NEONOWEGO SZUMU (Scanline Overlay) === */
+        .scanlines-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; 
+            z-index: 9999; 
+            opacity: 0.05; 
+            background: repeating-linear-gradient(
+                to bottom,
+                rgba(100, 100, 100, 0.2), 
+                rgba(0, 0, 0, 0.2) 1px, 
+                transparent 2px,
+                transparent 3px
+            );
+            animation: scanlines 5s infinite linear;
+        }
+
+        @keyframes scanlines {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 500px; }
+        }
+
+        /* === STYL I ANIMACJE DLA PŁATKÓW ŚNIEGU === */
+
+        #snowfall-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0; /* Znajduje się między tłem a zawartością */
+        }
+
+        .snowflake {
+            position: absolute;
+            background: #FFFFFF; 
+            border-radius: 50%;
+            opacity: 0.7;
+            /* Delikatny fioletowy neonowy blask dla śniegu */
+            box-shadow: 0 0 2px rgba(255, 255, 255, 0.8), 0 0 5px rgba(204, 51, 255, 0.5); 
+            animation-name: snowfall, wind-drift;
+            animation-iteration-count: infinite;
+            animation-timing-function: linear;
+        }
+
+        /* Animacja opadania */
+        @keyframes snowfall {
+            0% { transform: translate(0, -100vh); }
+            100% { transform: translate(0, 100vh); }
+        }
+
+        /* Animacja dryfowania (lekkie poruszanie się na boki) */
+        @keyframes wind-drift {
+            0% { margin-left: 0; }
+            50% { margin-left: 10px; }
+            100% { margin-left: 0; }
+        }
+
+        /* === PRZYCISK WRÓĆ NA GÓRĘ (Back to Top) === */
+        #back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background-color: rgba(204, 51, 255, 0.7); 
+            color: #FFFFFF;
+            border: 2px solid #FFFFFF;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 46px; /* Wyrównanie pionowe dla ^ */
+            font-size: 24px;
+            cursor: pointer;
+            opacity: 0; /* Początkowo niewidoczny */
+            transition: opacity 0.3s, transform 0.3s;
+            box-shadow: 0 0 10px #CC33FF;
+            z-index: 1000;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        #back-to-top:hover {
+            background-color: #CC33FF;
+            transform: scale(1.1);
+        }
+
+        .show-btn {
+            opacity: 1 !important;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="snowfall-container"></div> 
+
+    <header>
+        <h1 class="neon-text" id="top">TO JEST LEPSZE DUO</h1>
+        <p class="neon-text">ZAPISANI NA KARTACH HISTORII OD 31.08.2025</p>
+        
+        <p id="neon-clock" class="neon-text"></p>
+        
+        <p class="neon-alert">
+            Wiesz co z tym zrobić😎 👇
+        </p>
+        
+        <div class="volume-control-container">
+            <span class="volume-label">🔇</span>
+            <input type="range" id="volume-slider" min="0" max="100" value="5" oninput="setVolume(this.value)" onclick="playMusic()">
+            <span class="volume-label">🔊</span>
+        </div>
+        
+    </header>
+
+
+    <main>
+	
+        <section id="o-nas" class="content-box" style="text-align: center;">
+            <h2 class="neon-text">✨ WSTĘP</h2>
+            <p>
+                Jeśli kiedykolwiek będziesz miała zły dzień, kliknij suwak na górze i obejrzyj naszą galerię. Jesteśmy lepsi razem.
+            </p>
+        </section>
+        
+        <section id="galeria" class="content-box">
+            <h2 class="neon-text" style="text-align: center;">📸 Galeria Wspomnień</h2>
+            <div class="gallery-grid">
+                <div class="gallery-item"><img src="zdjecie_1.jpg" alt="Wspomnienie 1"></div>
+                <div class="gallery-item"><img src="zdjecie_2.jpg" alt="Wspomnienie 2"></div>
+                <div class="gallery-item"><img src="zdjecie_3.jpg" alt="Wspomnienie 3"></div>
+                <div class="gallery-item"><img src="zdjecie_4.jpg" alt="Wspomnienie 4"></div>
+                <div class="gallery-item"><img src="zdjecie_5.jpg" alt="Wspomnienie 5"></div>
+                <div class="gallery-item"><img src="zdjecie_6.jpg" alt="Wspomnienie 6"></div>
+                <div class="gallery-item"><img src="zdjecie_7.jpg" alt="Wspomnienie 7"></div>
+                <div class="gallery-item"><img src="zdjecie_8.jpg" alt="Wspomnienie 8"></div>
+                <div class="gallery-item"><img src="zdjecie_9.jpg" alt="Wspomnienie 9"></div>
+                <div class="gallery-item"><img src="zdjecie_10.jpg" alt="Wspomnienie 10"></div>
+                <div class="gallery-item"><img src="zdjecie_11.jpg" alt="Wspomnienie 11"></div>
+                <div class="gallery-item"><img src="zdjecie_12.jpg" alt="Wspomnienie 12"></div>
+                <div class="gallery-item"><img src="zdjecie_13.jpg" alt="Wspomnienie 13"></div>
+            </div>
+        </section>
+
+        <section id="gify" class="content-box">
+            <h2 class="neon-text" style="text-align: center;">💾 Nasze najlepsze gify😎</h2>
+            <p style="text-align: center; color: #F0F0FF; margin-bottom: 25px;">
+              
+            </p>
+            <div class="gallery-grid">
+                <div class="gallery-item"><img src="gif_1.gif" alt="Animowany moment 1"></div>
+                <div class="gallery-item"><img src="gif_2.gif" alt="Animowany moment 2"></div>
+                </div>
+        </section>
+        <section id="video" class="content-box" style="text-align: center;">
+            <h2 class="neon-text">🎥 NA PAMIĄTKĘ</h2>
+            <p style="text-align: center; color: #F0F0FF; margin-bottom: 25px;">
+                Film, który streszcza tysiąc wspomnień.
+            </p>
+            
+            <div style="text-align: center;">
+                <a href="https://www.youtube.com/watch?v=8kPpHkgS8T4" target="_blank" class="neon-button">
+                    Obejrzyj na youtube
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p class="neon-text">Stworzone z miłością i fioletowym blaskiem.</p>
+    </footer>
+
+    <div style="display: none;">
+        <audio id="background-audio" loop>
+            <source src="nasza_piosenka.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+    <div class="scanlines-overlay"></div>
+    
+    <a href="#top" id="back-to-top" title="Wróć na Górę">^</a>
+
+    <script>
+        
+        // === SKRYPT DO ANIMACJI TYTUŁU STRONY ===
+        // Używamy bieżącego tytułu i dodajemy drugi na zmianę
+        const titleOriginal = document.title; // "NAJLEPSZE DUO"
+        const titleAnimated = "TO DOPIERO POCZĄTEK????????"; 
+        let isAnimatedTitle = false;
+
+        function animateTitle() {
+            if (isAnimatedTitle) {
+                document.title = titleOriginal;
+            } else {
+                document.title = titleAnimated;
+            }
+            isAnimatedTitle = !isAnimatedTitle;
+        }
+
+        // Zmienia tytuł co 2 sekundy (2000 ms)
+        setInterval(animateTitle, 2000);
+        // =======================================
+        
+        
+        // === SKRYPT DO CYFROROWEGO ZEGARA ===
+        function updateClock() {
+            const now = new Date();
+            
+            // Formatowanie czasu (HH:MM:SS) i daty
+            const timeString = now.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const dateString = now.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            
+            // Wyświetlanie: [DATA] // [CZAS]
+            document.getElementById('neon-clock').textContent = `[${dateString}] // [${timeString}]`;
+        }
+        
+        // Aktualizowanie zegara co sekundę
+        setInterval(updateClock, 1000); 
+
+        // === SKRYPT DO STEROWANIA AUDIO ===
+        var isPlaying = false; 
+
+        function playMusic() {
+            if (isPlaying) return; 
+            
+            var audioPlayer = document.getElementById('background-audio');
+            
+            audioPlayer.play().then(function() {
+                isPlaying = true; 
+                setVolume(document.getElementById('volume-slider').value); 
+                console.log('Muzyka włączona pomyślnie!');
+            }).catch(function(error) {
+                alert('Błąd odtwarzania. Sprawdź, czy plik "nasza_piosenka.mp3" jest w folderze.');
+            });
+        }
+        
+        function setVolume(volumeValue) {
+            var audioPlayer = document.getElementById('background-audio');
+            audioPlayer.volume = volumeValue / 100;
+        }
+        
+        // === LOGIKA PRZYCISKU WRÓĆ NA GÓRĘ ===
+        const backToTopButton = document.getElementById("back-to-top");
+
+        window.onscroll = function() {scrollFunction()};
+        
+        function scrollFunction() {
+            // Pokaż przycisk, jeśli przewinięto więcej niż 200 pikseli
+            if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+                backToTopButton.classList.add('show-btn');
+            } else {
+                backToTopButton.classList.remove('show-btn');
+            }
+        }
+        
+        // === SKRYPT DO GENEROWANIA PŁATKÓW ŚNIEGU ===
+        
+        const snowfallContainer = document.getElementById('snowfall-container');
+        
+        function generateSnowflakes(count) {
+            for (let i = 0; i < count; i++) {
+                const snowflake = document.createElement('div');
+                snowflake.classList.add('snowflake');
+
+                // Losowy rozmiar (2px do 5px)
+                const size = Math.random() * 3 + 2; 
+                snowflake.style.width = `${size}px`;
+                snowflake.style.height = `${size}px`;
+
+                // Losowa pozycja startowa (szerokość)
+                snowflake.style.left = `${Math.random() * 100}vw`;
+
+                // Losowy czas trwania opadania (od 10s do 30s)
+                const fallDuration = Math.random() * 20 + 10; 
+                snowflake.style.animationDuration = `${fallDuration}s, ${fallDuration / 4}s`; // Podział animacji
+
+                // Losowe opóźnienie animacji
+                snowflake.style.animationDelay = `-${Math.random() * fallDuration}s, -${Math.random() * fallDuration}s`;
+
+                snowfallContainer.appendChild(snowflake);
+            }
+        }
+
+        // Inicjalizacja: wywołaj wszystkie funkcje startowe
+        window.onload = function() {
+             setVolume(document.getElementById('volume-slider').value); 
+             generateSnowflakes(50); // Generuje 50 płatków
+             updateClock(); // Ustawia zegar od razu
+        };
+    </script>
+</body>
+</html>
