@@ -98,8 +98,9 @@
             /* WŁĄCZONA ANIMACJA PULSACJI */
             animation: neon-pulse 10s infinite alternate; 
             
-            text-align: left;
+            text-align: center; /* ZMIANA: Wyśrodkowanie elementów wewnątrz, w tym h2 */
             line-height: 1.6;
+            position: relative; 
         }
 
         .content-box p {
@@ -256,7 +257,7 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 0; /* Znajduje się między tłem a zawartością */
+            z-index: 10; /* Teraz jest nad tłem, ale pod główną treścią */
         }
 
         .snowflake {
@@ -296,10 +297,10 @@
             border: 2px solid #FFFFFF;
             border-radius: 50%;
             text-align: center;
-            line-height: 46px; /* Wyrównanie pionowe dla ^ */
+            line-height: 46px; 
             font-size: 24px;
             cursor: pointer;
-            opacity: 0; /* Początkowo niewidoczny */
+            opacity: 0; 
             transition: opacity 0.3s, transform 0.3s;
             box-shadow: 0 0 10px #CC33FF;
             z-index: 1000;
@@ -316,10 +317,141 @@
             opacity: 1 !important;
         }
 
+        /* ====================================================
+        === DODANE DLA ŚWIĄTECZNYCH DEKORACJI (START) === 
+        ====================================================
+        */
+
+        /* === ŚWIĄTECZNE ŚWIATEŁKA GÓRNE === */
+        .christmas-lights {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 25px; 
+            pointer-events: none;
+            z-index: 100; /* Nad wszystkim */
+            overflow: hidden;
+            /* Subtelna linia jako 'kabel' */
+            background: linear-gradient(to right, #CC33FF 0%, #00FFFF 50%, #FF66CC 100%);
+            background-size: 200% 1px;
+            background-position: 0 12px;
+            background-repeat: no-repeat;
+        }
+
+        .light-bulb {
+            position: absolute;
+            width: 12px; 
+            height: 12px;
+            border-radius: 50%;
+            top: 0;
+            transform: translateY(-50%);
+            animation: pulse-light 1.5s infinite alternate;
+        }
+
+        /* Definicja kolorów */
+        .red { background-color: #FF4444; box-shadow: 0 0 8px #FF4444; }
+        .blue { background-color: #4444FF; box-shadow: 0 0 8px #4444FF; }
+        .green { background-color: #44FF44; box-shadow: 0 0 8px #44FF44; }
+        .purple { background-color: #CC33FF; box-shadow: 0 0 8px #CC33FF; }
+
+        /* Animacja migania/pulsowania */
+        @keyframes pulse-light {
+            0% { opacity: 0.5; box-shadow: 0 0 3px currentColor; }
+            100% { opacity: 1; box-shadow: 0 0 10px currentColor, 0 0 20px currentColor; }
+        }
+
+        /* Pozycjonowanie i opóźnienia dla 26 żarówek */
+        .light-bulb:nth-child(4n+1) { animation-delay: 0.1s; }
+        .light-bulb:nth-child(4n+2) { animation-delay: 0.5s; }
+        .light-bulb:nth-child(4n+3) { animation-delay: 0.9s; }
+        .light-bulb:nth-child(4n+4) { animation-delay: 0.3s; }
+        .light-bulb:nth-child(1) { left: 0%; } .light-bulb:nth-child(2) { left: 4%; } .light-bulb:nth-child(3) { left: 8%; } .light-bulb:nth-child(4) { left: 12%; }
+        .light-bulb:nth-child(5) { left: 16%; } .light-bulb:nth-child(6) { left: 20%; } .light-bulb:nth-child(7) { left: 24%; } .light-bulb:nth-child(8) { left: 28%; }
+        .light-bulb:nth-child(9) { left: 32%; } .light-bulb:nth-child(10) { left: 36%; } .light-bulb:nth-child(11) { left: 40%; } .light-bulb:nth-child(12) { left: 44%; }
+        .light-bulb:nth-child(13) { left: 48%; } .light-bulb:nth-child(14) { left: 52%; } .light-bulb:nth-child(15) { left: 56%; } .light-bulb:nth-child(16) { left: 60%; }
+        .light-bulb:nth-child(17) { left: 64%; } .light-bulb:nth-child(18) { left: 68%; } .light-bulb:nth-child(19) { left: 72%; } .light-bulb:nth-child(20) { left: 76%; }
+        .light-bulb:nth-child(21) { left: 80%; } .light-bulb:nth-child(22) { left: 84%; } .light-bulb:nth-child(23) { left: 88%; } .light-bulb:nth-child(24) { left: 92%; }
+        .light-bulb:nth-child(25) { left: 96%; } .light-bulb:nth-child(26) { left: 100%; }
+
+
+        /* === DEKORACJE SEKCJI (MALE ŚWIATEŁKA PRZY H2) === */
+        
+        .content-box h2 {
+            position: relative; /* Umożliwia pozycjonowanie absolutne dekoracji */
+            display: inline-block; /* Umożliwia dopasowanie szerokości do tekstu, ale pozwala na wyśrodkowanie */
+            padding: 0 15px;
+        }
+
+        /* Dekoracja po lewej stronie nagłówka (Śnieżynka - Błękitny Neon) */
+        .content-box h2::before {
+            content: '❄'; 
+            position: absolute;
+            left: -25px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2em;
+            color: #00FFFF;
+            text-shadow: 0 0 5px #00FFFF, 0 0 10px #00FFFF;
+            animation: neon-blink 2s infinite step-end;
+        }
+
+        /* Dekoracja po prawej stronie nagłówka (Choinka - Różowy Neon) */
+        .content-box h2::after {
+            content: '🎄'; 
+            position: absolute;
+            right: -25px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2em;
+            color: #FF66CC;
+            text-shadow: 0 0 5px #FF66CC, 0 0 10px #FF66CC;
+            animation: neon-blink 2s infinite step-start;
+        }
+
+        /* Animacja mrugania dla dekoracji */
+        @keyframes neon-blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        
+        /* ====================================================
+        === DODANE DLA ŚWIĄTECZNYCH DEKORACJI (KONIEC) === 
+        ====================================================
+        */
+
     </style>
 </head>
 <body>
 
+    <div class="christmas-lights">
+        <div class="light-bulb red"></div>
+        <div class="light-bulb blue"></div>
+        <div class="light-bulb green"></div>
+        <div class="light-bulb purple"></div>
+        <div class="light-bulb red"></div>
+        <div class="light-bulb blue"></div>
+        <div class="light-bulb green"></div>
+        <div class="light-bulb purple"></div>
+        <div class="light-bulb red"></div>
+        <div class="light-bulb blue"></div>
+        <div class="light-bulb green"></div>
+        <div class="light-bulb purple"></div>
+        <div class="light-bulb red"></div>
+        <div class="light-bulb blue"></div>
+        <div class="light-bulb green"></div>
+        <div class="light-bulb purple"></div>
+        <div class="light-bulb red"></div>
+        <div class="light-bulb blue"></div>
+        <div class="light-bulb green"></div>
+        <div class="light-bulb purple"></div>
+        <div class="light-bulb red"></div>
+        <div class="light-bulb blue"></div>
+        <div class="light-bulb green"></div>
+        <div class="light-bulb purple"></div>
+        <div class="light-bulb red"></div>
+        <div class="light-bulb blue"></div>
+    </div>
     <div id="snowfall-container"></div> 
 
     <header>
@@ -342,16 +474,16 @@
 
 
     <main>
-	
-        <section id="o-nas" class="content-box" style="text-align: center;">
+        
+        <section id="o-nas" class="content-box">
             <h2 class="neon-text">✨ WSTĘP</h2>
-            <p>
+            <p style="text-align: justify;">
                 Jeśli kiedykolwiek będziesz miała zły dzień, kliknij suwak na górze i obejrzyj naszą galerię. Jesteśmy lepsi razem.
             </p>
         </section>
         
         <section id="galeria" class="content-box">
-            <h2 class="neon-text" style="text-align: center;">📸 Galeria Wspomnień</h2>
+            <h2 class="neon-text">📸 Galeria Wspomnień</h2>
             <div class="gallery-grid">
                 <div class="gallery-item"><img src="zdjecie_1.jpg" alt="Wspomnienie 1"></div>
                 <div class="gallery-item"><img src="zdjecie_2.jpg" alt="Wspomnienie 2"></div>
@@ -370,16 +502,16 @@
         </section>
 
         <section id="gify" class="content-box">
-            <h2 class="neon-text" style="text-align: center;">💾 Nasze najlepsze gify😎</h2>
+             <h2 class="neon-text">💾 Nasze najlepsze gify😎</h2>
             <p style="text-align: center; color: #F0F0FF; margin-bottom: 25px;">
-              
+                
             </p>
             <div class="gallery-grid">
                 <div class="gallery-item"><img src="gif_1.gif" alt="Animowany moment 1"></div>
                 <div class="gallery-item"><img src="gif_2.gif" alt="Animowany moment 2"></div>
                 </div>
         </section>
-        <section id="video" class="content-box" style="text-align: center;">
+        <section id="video" class="content-box">
             <h2 class="neon-text">🎥 NA PAMIĄTKĘ</h2>
             <p style="text-align: center; color: #F0F0FF; margin-bottom: 25px;">
                 Film, który streszcza tysiąc wspomnień.
@@ -391,8 +523,7 @@
                 </a>
             </div>
         </section>
-
-    </main>
+        </main>
 
     <footer>
         <p class="neon-text">Stworzone z miłością i fioletowym blaskiem.</p>
@@ -410,8 +541,7 @@
     <script>
         
         // === SKRYPT DO ANIMACJI TYTUŁU STRONY ===
-        // Używamy bieżącego tytułu i dodajemy drugi na zmianę
-        const titleOriginal = document.title; // "NAJLEPSZE DUO"
+        const titleOriginal = document.title; 
         const titleAnimated = "TO DOPIERO POCZĄTEK????????"; 
         let isAnimatedTitle = false;
 
@@ -424,24 +554,19 @@
             isAnimatedTitle = !isAnimatedTitle;
         }
 
-        // Zmienia tytuł co 2 sekundy (2000 ms)
         setInterval(animateTitle, 2000);
-        // =======================================
         
         
         // === SKRYPT DO CYFROROWEGO ZEGARA ===
         function updateClock() {
             const now = new Date();
             
-            // Formatowanie czasu (HH:MM:SS) i daty
             const timeString = now.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
             const dateString = now.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric' });
             
-            // Wyświetlanie: [DATA] // [CZAS]
             document.getElementById('neon-clock').textContent = `[${dateString}] // [${timeString}]`;
         }
         
-        // Aktualizowanie zegara co sekundę
         setInterval(updateClock, 1000); 
 
         // === SKRYPT DO STEROWANIA AUDIO ===
@@ -472,7 +597,6 @@
         window.onscroll = function() {scrollFunction()};
         
         function scrollFunction() {
-            // Pokaż przycisk, jeśli przewinięto więcej niż 200 pikseli
             if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
                 backToTopButton.classList.add('show-btn');
             } else {
@@ -499,7 +623,7 @@
 
                 // Losowy czas trwania opadania (od 10s do 30s)
                 const fallDuration = Math.random() * 20 + 10; 
-                snowflake.style.animationDuration = `${fallDuration}s, ${fallDuration / 4}s`; // Podział animacji
+                snowflake.style.animationDuration = `${fallDuration}s, ${fallDuration / 4}s`; 
 
                 // Losowe opóźnienie animacji
                 snowflake.style.animationDelay = `-${Math.random() * fallDuration}s, -${Math.random() * fallDuration}s`;
