@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NAJLEPSZE DUO</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* WSTĘPNE ZEROWANIE MARGINESÓW I PADDINGÓW */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif; 
+        }
+
+        /* === GŁÓWNY STYL DLA NOWOCZESNEGO TŁA (DOMYŚLNY) === */
+        body {
+            color: #E0E0E0; /* Jasny tekst na ciemnym tle */
+            background-color: #080815; /* Bardzo ciemny granat */
+            background-image: url('moje_tlo_miasto.jpg'); 
+            background-size: cover;
+            background-attachment: fixed; 
+            text-align: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden; 
+        }
+
+        /* Warstwa gradientu nałożona na tło, dla nowoczesnego efektu */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Nowoczesny, ciemny, subtelny gradient */
+            background: linear-gradient(135deg, rgba(12, 12, 24, 0.9) 0%, rgba(18, 18, 40, 0.7) 100%);
+            z-index: -1; 
+            transition: background 0.5s ease; /* Płynne przejście */
+        }
+
+        /* === STYL RETRO NEON (AKTYWOWANY PRZEZ KLASĘ .retro-theme) === */
+        .retro-theme {
+            background-color: #000000; /* Klasyczna czerń */
+            background-image: url('moje_tlo_miasto.jpg'); /* Zachowujemy tło */
+        }
+        
+        .retro-theme::before {
+            /* Jasny, neonowy gradient dla kontrastu */
+            background: radial-gradient(circle, rgba(10, 2, 20, 0.8) 0%, rgba(0, 0, 0, 0.9) 100%);
+        }
+
+        .retro-theme h1, .retro-theme h2 {
+            color: #00FFFF !important; /* Cyjanowy neon */
+            text-shadow: 0 0 5px #00FFFF, 0 0 10px #00FFFF, 0 0 20px #FF00FF, 0 0 40px #FF00FF; /* Neonowy blask */
+        }
+        
+        .retro-theme .content-box {
+            /* KLUCZ: Usuwamy glassmorphism, dodajemy neonową ramkę i cień */
+            background: rgba(0, 0, 0, 0.7); 
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            border: 2px solid #FF00FF; /* Różowa neonowa ramka */
+            box-shadow: 0 0 10px #FF00FF, 0 0 20px #00FFFF; /* Migający neon */
+        }
+        
+        .retro-theme .content-box:hover {
+            transform: none; /* Usuń uniesienie */
+            box-shadow: 0 0 15px #FF00FF, 0 0 30px #00FFFF;
+        }
+
+        .retro-theme .modern-button {
+            background: linear-gradient(45deg, #FF00FF 0%, #00FFFF 100%) !important;
+            box-shadow: 0 0 10px #FF00FF;
+        }
+        
+        .retro-theme .neon-alert {
+            color: #FFFF00; /* Żółty neon */
+            border: 1px solid rgba(255, 255, 0, 0.5);
+            box-shadow: 0 0 5px #FFFF00;
+        }
+
+        /* Styl dla zegara i licznika w motywie retro */
+        .retro-theme #neon-clock, .retro-theme #visit-counter {
+            color: #00FF00; /* Zielony neon */
+            text-shadow: 0 0 5px #00FF00;
+        }
+        
+        /* Usuń nowoczesne tło z audio widgetu, zastąp neonem */
+        .retro-theme #floating-music-widget {
+            background: rgba(0, 0, 0, 0.8) !important;
+            backdrop-filter: none !important;
+            border: 1px solid #00FFFF !important;
+            box-shadow: 0 0 10px #00FFFF !important;
+        }
+        /* Usuwamy stary neonowy styl z HR (nowy retro) */
+        .retro-theme hr {
+            background: #FF00FF;
+            box-shadow: 0 0 5px #FF00FF;
+            height: 2px;
+        }
+        /* KONIEC STYLÓW RETRO */
+
+        header, main, footer {
+            margin: 20px auto;
+            max-width: 1000px;
+            z-index: 2; /* Upewnij się, że treść jest nad body::before */
+            position: relative;
+        }
+        
+        /* === STYL LOGO I TYPOGRAFII === */
+
+        #logo-container {
+            margin-bottom: 20px;
+        }
+
+        #logo-container img {
+            width: 150px; /* Rozmiar logo */
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Subtelny cień 3D */
+            transition: transform 0.3s ease;
+        }
+
+        #logo-container img:hover {
+            transform: scale(1.05);
+        }
+
+        header h1 {
+            font-size: 3em;
+            color: #FFFFFF;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3); 
+            margin-bottom: 5px;
+            transition: all 0.5s ease; /* Płynne przejście koloru */
+        }
+        
+        h2 {
+            color: #B0B0FF; /* Jasny fiolet/niebieski */
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+            transition: all 0.5s ease;
+        }
+        
+        /* === GLASSMORHPISM BLOKI (Mrożone Szkło) === */
+        .content-box {
+            background: rgba(255, 255, 255, 0.08); 
+            backdrop-filter: blur(10px); 
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2); 
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); 
+            text-align: center; 
+            line-height: 1.7;
+            transition: all 0.3s ease;
+        }
+        
+        .content-box:hover {
+            background: rgba(255, 255, 255, 0.12); 
+            transform: translateY(-3px); 
+        }
+
+        .content-box p {
+            color: #E0E0E0; 
+            font-size: 1em;
+            text-align: justify; 
+            text-shadow: none;
+        }
+        
+        .content-box p:hover {
+            background-color: rgba(255, 255, 255, 0.05); 
+            color: #FFFFFF;
+            border-radius: 5px;
+            padding: 5px;
+            cursor: default;
+        }
+        
+        hr {
+            border: none;
+            height: 1px;
+            margin: 30px auto;
+            width: 50%;
+            background: rgba(255, 255, 255, 0.1); 
+            box-shadow: none;
+            transition: all 0.5s ease;
+        }
+        
+        /* === STYL PRZYCISKU (W TYM PRZEŁĄCZNIKA MOTYWÓW) === */
+        .modern-button {
+            display: inline-block;
+            width: fit-content;
+            margin: 20px 10px 0 10px; /* Zwiększony margines na boki */
+            padding: 12px 25px;
+            text-decoration: none;
+            font-size: 1.1em;
+            font-weight: 600;
+            border: none;
+            color: #FFFFFF; 
+            border-radius: 8px;
+            /* Nowoczesny gradient */
+            background: linear-gradient(135deg, #A044FF 0%, #FF70A6 100%);
+            box-shadow: 0 4px 15px rgba(160, 68, 255, 0.4);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .modern-button:hover {
+            background: linear-gradient(135deg, #B055FF 0%, #FF85BB 100%);
+            box-shadow: 0 6px 20px rgba(160, 68, 255, 0.6);
+            transform: translateY(-2px);
+        }
+
+        /* Styl dla przycisku Przełącz Motyw */
+        #theme-toggle-button {
+            margin-top: 15px;
+            margin-bottom: 25px;
+            background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%); /* Ciemniejszy, neutralny gradient */
+            font-size: 0.9em;
+            padding: 8px 15px;
+        }
+        
+        #theme-toggle-button:hover {
+            box-shadow: 0 4px 10px rgba(42, 82, 152, 0.6);
+            transform: translateY(-1px);
+        }
+
+        /* === GALERIA i MEDIA === */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .gallery-item img:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 20px rgba(160, 68, 255, 0.4); 
+        }
+        
+        /* === PŁYWAJĄCY ODTWARZACZ (NOWOCZESNY WIDGET) === */
+        #floating-music-widget {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            width: 300px;
+            padding: 15px 20px;
+            
+            background: rgba(255, 255, 255, 0.1); 
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .widget-title {
+            color: #FFFFFF;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .volume-control-container {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        #volume-slider {
+            flex-grow: 1;
+            margin: 0 10px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3); 
+            border-radius: 2px;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        #volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #FF70A6; /* Różowy akcent */
+            cursor: pointer;
+            box-shadow: 0 0 5px #FF70A6;
+        }
+        
+        .volume-label {
+            color: #E0E0E0;
+            font-size: 1em;
+        }
+        
+        /* Zmiany dla czystszego headera/footer */
+        header p, footer p {
+            color: #AAAAAA;
+            text-shadow: none;
+        }
+        
+        .neon-alert {
+            color: #FF70A6;
+            border: 1px solid rgba(255, 112, 166, 0.3);
+            border-radius: 8px;
+            padding: 10px;
+            margin: 15px auto;
+            max-width: 400px;
+            display: block;
+            transition: all 0.5s ease;
+        }
+        
+        /* Dodatkowe style dla przycisku "Wróć na górę" */
+        #back-to-top {
+            position: fixed; bottom: 120px; right: 30px;
+            width: 40px; height: 40px; 
+            background: rgba(255, 255, 255, 0.1); 
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #FFFFFF; border-radius: 50%;
+            text-align: center; line-height: 38px; font-size: 20px;
+            cursor: pointer; opacity: 0; transition: opacity 0.3s, transform 0.3s, background 0.5s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            z-index: 900; text-decoration: none;
+        }
+        #back-to-top:hover { background-color: rgba(255, 255, 255, 0.2); transform: scale(1.1); }
+        .show-btn { opacity: 1 !important; }
+        
+        /* Styl #back-to-top w motywie retro */
+        .retro-theme #back-to-top {
+            background: rgba(0, 0, 0, 0.8) !important;
+            border: 2px solid #FF00FF !important;
+            box-shadow: 0 0 10px #FF00FF !important;
+            backdrop-filter: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="snowfall-container"></div> 
+
+    <header>
+        <div id="logo-container">
+               <img src="logo.png" alt="Logo Lepsze Duo">
+        </div>
+        
+        <h1>TO JEST LEPSZE DUO</h1>
+        <p>ZAPISANI NA KARTACH HISTORII OD 31.08.2025</p>
+        
+        <p id="neon-clock"></p>
+        
+        <p id="visit-counter" style="font-size: 1.2em; margin-top: 10px;"></p>
+        
+        <button id="theme-toggle-button" class="modern-button" onclick="toggleTheme()">
+            Przełącz Motyw (Retro/Glass)
+        </button>
+        <p class="neon-alert">
+            Wiesz co z tym zrobić😎 👇
+        </p>
+        
+    </header>
+
+
+    <main>
+    
+        <section id="o-nas" class="content-box">
+            <h2>✨ WSTĘP</h2>
+            <p>
+                Jeśli kiedykolwiek będziesz miała zły dzień, kliknij przycisk odtwarzacza na dole ekranu i obejrzyj naszą galerię. Jesteśmy lepsi razem.
+            </p>
+        </section>
+        
+        <hr> 
+        
+        <section id="galeria" class="content-box">
+            <h2>📸 Galeria Wspomnień</h2>
+            <div class="gallery-grid">
+                <div class="gallery-item"><img src="zdjecie_1.jpg" alt="Wspomnienie 1"></div>
+                <div class="gallery-item"><img src="zdjecie_2.jpg" alt="Wspomnienie 2"></div>
+                <div class="gallery-item"><img src="zdjecie_3.jpg" alt="Wspomnienie 3"></div>
+                <div class="gallery-item"><img src="zdjecie_4.jpg" alt="Wspomnienie 4"></div>
+                <div class="gallery-item"><img src="zdjecie_5.jpg" alt="Wspomnienie 5"></div>
+                <div class="gallery-item"><img src="zdjecie_6.jpg" alt="Wspomnienie 6"></div>
+                <div class="gallery-item"><img src="zdjecie_7.jpg" alt="Wspomnienie 7"></div>
+                <div class="gallery-item"><img src="zdjecie_8.jpg" alt="Wspomnienie 8"></div>
+                <div class="gallery-item"><img src="zdjecie_9.jpg" alt="Wspomnienie 9"></div>
+                <div class="gallery-item"><img src="zdjecie_10.jpg" alt="Wspomnienie 10"></div>
+                <div class="gallery-item"><img src="zdjecie_11.jpg" alt="Wspomnienie 11"></div>
+                <div class="gallery-item"><img src="zdjecie_12.jpg" alt="Wspomnienie 12"></div>
+                <div class="gallery-item"><img src="zdjecie_13.jpg" alt="Wspomnienie 13"></div>
+            </div>
+        </section>
+
+        <hr> 
+
+        <section id="gify" class="content-box">
+            <h2>💾 Nasze najlepsze gify😎</h2>
+            <p style="text-align: center; color: #E0E0E0; margin-bottom: 25px;">
+                
+            </p>
+            <div class="gallery-grid">
+                <div class="gallery-item"><img src="gif_1.gif" alt="Animowany moment 1"></div>
+                <div class="gallery-item"><img src="gif_2.gif" alt="Animowany moment 2"></div>
+                </div>
+        </section>
+
+        <hr> 
+        
+        <section id="video" class="content-box">
+            <h2>🎥 NA PAMIĄTKĘ</h2>
+            <p style="text-align: center; color: #E0E0E0; margin-bottom: 25px;">
+                Film, który streszcza tysiąc wspomnień.
+            </p>
+            
+            <div style="text-align: center;">
+                <a href="https://www.youtube.com/watch?v=8kPpHkgS8T4" target="_blank" class="modern-button">
+                    Obejrzyj na YouTube
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>Stworzone z miłością i nowoczesnym stylem.</p>
+    </footer>
+
+    <div id="floating-music-widget">
+        <div class="widget-title">🎶 Nasza Piosenka - Spotify Widget (Włącz)</div>
+        <div class="volume-control-container">
+            <span class="volume-label">🔇</span>
+            <input type="range" id="volume-slider" min="0" max="100" value="5" oninput="setVolume(this.value)" onclick="playMusic()">
+            <span class="volume-label">🔊</span>
+        </div>
+    </div>
+    
+    <div style="display: none;">
+        <audio id="background-audio" loop>
+            <source src="nasza_piosenka.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+    
+    <a href="#top" id="back-to-top" title="Wróć na Górę">^</a>
+
+    <script>
+        
+        // --- SKRYPT DO PRZEŁĄCZANIA MOTYWÓW ---
+        function toggleTheme() {
+            const body = document.body;
+            const isRetro = body.classList.toggle('retro-theme');
+            
+            // Zapisz wybór użytkownika w LocalStorage
+            localStorage.setItem('theme', isRetro ? 'retro' : 'glass');
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'retro') {
+                document.body.classList.add('retro-theme');
+            } else {
+                // Domyślny motyw to Glassmorphism
+                document.body.classList.remove('retro-theme');
+            }
+        }
+        
+        // --- SKRYPT DO ANIMACJI TYTUŁU STRONY ---
+        const titleOriginal = document.title;
+        const titleAnimated = "TO DOPIERO POCZĄTEK????????"; 
+        let isAnimatedTitle = false;
+
+        function animateTitle() {
+            if (isAnimatedTitle) {
+                document.title = titleOriginal;
+            } else {
+                document.title = titleAnimated;
+            }
+            isAnimatedTitle = !isAnimatedTitle;
+        }
+        setInterval(animateTitle, 2000);
+        
+        
+        // --- SKRYPT DO CYFROWEGO ZEGARA ---
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const dateString = now.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            document.getElementById('neon-clock').textContent = `[${dateString}] // [${timeString}]`;
+        }
+        setInterval(updateClock, 1000); 
+
+        // --- SKRYPT DO LICZNIKA WIZYT ---
+        function initVisitCounter() {
+            const storageKey = 'duoVisitCount'; 
+            let count = 0;
+            const storedCount = localStorage.getItem(storageKey);
+
+            if (storedCount) {
+                count = parseInt(storedCount, 10) + 1;
+            } else {
+                count = 1;
+            }
+
+            localStorage.setItem(storageKey, count);
+            const counterElement = document.getElementById('visit-counter');
+            if (counterElement) {
+                // Nowoczesny styl licznika
+                counterElement.innerHTML = `⭐ WIZYTA NUMER: <span style="color: #FF70A6;">${count}</span> ⭐`;
+            }
+        }
+
+        // --- SKRYPT DO STEROWANIA AUDIO ---
+        var isPlaying = false; 
+
+        function playMusic() {
+            if (isPlaying) return; 
+            
+            var audioPlayer = document.getElementById('background-audio');
+            
+            audioPlayer.play().then(function() {
+                isPlaying = true; 
+                setVolume(document.getElementById('volume-slider').value); 
+                document.querySelector('.widget-title').textContent = '🔊 Nasza Piosenka - ODTWARZANIE...';
+            }).catch(function(error) {
+                // Komunikat pozostawiony dla ułatwienia debugowania przez użytkownika
+                // alert('Błąd odtwarzania. Sprawdź, czy plik "nasza_piosenka.mp3" jest w folderze.');
+                document.querySelector('.widget-title').textContent = '⚠️ BŁĄD AUDIO (Wymagany MP3)';
+            });
+        }
+        
+        function setVolume(volumeValue) {
+            var audioPlayer = document.getElementById('background-audio');
+            audioPlayer.volume = volumeValue / 100;
+        }
+        
+        // --- LOGIKA PRZYCISKU WRÓĆ NA GÓRĘ ---
+        const backToTopButton = document.getElementById("back-to-top");
+        
+        window.onscroll = function() {scrollFunction()};
+        
+        function scrollFunction() {
+            if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+                backToTopButton.classList.add('show-btn');
+            } else {
+                backToTopButton.classList.remove('show-btn');
+            }
+        }
+        
+        // --- Inicjalizacja: wywołaj wszystkie funkcje startowe ---
+        window.onload = function() {
+              loadTheme(); // Wczytaj zapisany motyw
+              setVolume(document.getElementById('volume-slider').value); 
+              updateClock();
+              initVisitCounter();
+        };
+    </script>
+</body>
+</html>
