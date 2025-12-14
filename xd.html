@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NAJLEPSZE DUO</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ======================================= */
+        /* === 1. STYLE GLOBALNE I PODSTAWOWE === */
+        /* ======================================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif; 
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Ustawienia bazowe, które są dziedziczone przez wszystkie motywy */
+        body {
+            text-align: center;
+            min-height: 100vh;
+            padding: 20px;
+            transition: all 0.5s ease-in-out; 
+        }
+
+        /* Styl dla wszystkich przycisków motywów (baza) */
+        .theme-toggle-button {
+            display: inline-block;
+            width: fit-content;
+            margin: 0 5px;
+            padding: 10px 20px;
+            text-decoration: none;
+            font-size: 1em;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            /* Domyślne style przycisków dla Glassmorphism */
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #FFFFFF;
+        }
+        
+        .theme-toggle-button:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        .theme-toggle-container {
+            margin: 25px auto;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        /* === WSPÓLNE ELEMENTY (HEADER, MAIN, FOOTER) === */
+        header, main, footer {
+            margin: 20px auto;
+            max-width: 900px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+            gap: 20px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 5px;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        /* ================================================= */
+        /* === MOTYW 1: GLASSMORPHISM (DOMYŚLNY - BRAK KLASY) === */
+        /* ================================================= */
+        body:not(.neon-theme):not(.dark-theme) {
+            color: #E0E0E0; 
+            background-color: #080815; 
+            background-image: url('moje_tlo_miasto.jpg'); 
+            background-size: cover;
+            background-attachment: fixed; 
+        }
+
+        body:not(.neon-theme):not(.dark-theme)::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(12, 12, 24, 0.9) 0%, rgba(18, 18, 40, 0.7) 100%);
+            z-index: -1; 
+            transition: background 0.5s ease;
+        }
+        
+        body:not(.neon-theme):not(.dark-theme) .content-box {
+            background: rgba(255, 255, 255, 0.08); 
+            backdrop-filter: blur(10px); 
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2); 
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); 
+            transition: all 0.3s ease;
+        }
+        
+        body:not(.neon-theme):not(.dark-theme) .content-box:hover {
+            background: rgba(255, 255, 255, 0.12); 
+            transform: translateY(-3px); 
+        }
+
+        body:not(.neon-theme):not(.dark-theme) h1 {
+            color: #A044FF; 
+            text-shadow: 0 0 5px rgba(160, 68, 255, 0.5);
+            font-weight: 700;
+        }
+
+        /* =============================================== */
+        /* === MOTYW 2: NEON/ŚWIĄTECZNY (.neon-theme) === */
+        /* =============================================== */
+        /* --- ZACHOWANE STYLE UŻYTKOWNIKA DLA NEON --- */
+        
+        .neon-theme {
+            color: #CC33FF; 
+            background-color: #000000;
+            background-image: url('moje_tlo_miasto.jpg'); 
+            background-size: cover;
+            background-attachment: fixed; 
+        }
+
+        /* EFEKT WIZUALNY NA TLE ZDJĘCIA DLA POPRAWY CZYTELNOŚCI (NEON) */
+        .neon-theme::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7); 
+            z-index: -1; 
+        }
+        
+        /* ... pozostałe style .neon-theme ... */
+        @keyframes neon-flicker { /* ... */ }
+        .neon-theme header h1 { /* ... */ animation: neon-flicker 4s infinite alternate; /* ... */ }
+        .neon-theme h1, .neon-theme h2, .neon-theme .neon-text {
+            text-shadow: 0 0 5px #E66FFF, 0 0 15px #E66FFF, 0 0 40px rgba(230, 111, 255, 0.9);
+            color: #FFFFFF; 
+            font-weight: 700;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+        }
+        
+        /* STYLA KONTENERÓW I RAMKÓW Z ANIMACJĄ PULSACJI */
+        @keyframes neon-pulse { /* ... */ }
+        .neon-theme .content-box {
+            background-color: rgba(0, 0, 15, 0.10); 
+            border: 2px solid #CC33FF; 
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            animation: neon-pulse 10s infinite alternate; 
+            /* ... */
+        }
+
+        /* === STYL PRZYCISKU (NEON) nadpisuje domyślny .theme-toggle-button === */
+        .neon-theme .neon-button, .neon-theme .theme-toggle-button {
+            border: 3px solid #CC33FF; 
+            color: #CC33FF; 
+            background-color: rgba(204, 51, 255, 0.1); 
+            box-shadow: 0 0 10px #CC33FF, 0 0 20px rgba(204, 51, 255, 0.7);
+            text-shadow: 0 0 5px #CC33FF;
+            border-radius: 50px;
+        }
+        
+        /* ... inne style neon-theme (galeria, hr, dekoracje) ... */
+        .neon-theme .gallery-item img { border: 1px solid #CC33FF; box-shadow: 0 0 8px #CC33FF; }
+        .neon-theme hr { /* ... */ animation: hr-flicker 2s infinite alternate; }
+        .neon-theme .christmas-lights, .neon-theme .content-box h2::before, .neon-theme .content-box h2::after { display: block; }
+
+        /* ================================================= */
+        /* === MOTYW 3: CZERŃ/FUTURYZM (.dark-theme) === */
+        /* ================================================= */
+
+        .dark-theme {
+            background-color: #121212; 
+            background-image: none; 
+            color: #E0E0E0;
+            box-shadow: none;
+        }
+        
+        .dark-theme::before {
+             /* Duży, rozmyty okrąg w tle (jak na wzorze) */
+            content: '';
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 80vh;
+            height: 80vh;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 0, 255, 0.1) 0%, rgba(0, 255, 255, 0.1) 50%, rgba(18, 18, 18, 0) 70%);
+            transform: translate(-50%, -50%);
+            z-index: -2;
+        }
+        
+        .dark-theme::after {
+            content: none; /* Wyłączenie neonowego overlay'u */
+        }
+
+        .dark-theme header h1 {
+            color: #00FFFF; 
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+            font-size: 4em; 
+            letter-spacing: 5px;
+            font-weight: 900;
+            animation: none; /* Wyłącz animację migotania dla tytułu */
+        }
+        
+        .dark-theme h2 {
+            color: #FF00FF; 
+            font-weight: 300; 
+            letter-spacing: 5px;
+            margin-bottom: 25px;
+            text-align: center;
+            text-shadow: 0 0 5px #FF00FF;
+        }
+        
+        /* Reset stylu kontenera dla futuryzmu */
+        .dark-theme .content-box {
+            background: transparent; 
+            backdrop-filter: none;
+            border: none;
+            border-radius: 0;
+            box-shadow: none; 
+            padding: 30px;
+            margin-bottom: 60px;
+            text-align: center; 
+            position: relative; 
+            min-height: 200px;
+            overflow: hidden; 
+            animation: none; /* Wyłącz animację pulsacji */
+        }
+        
+        .dark-theme .content-box p {
+            color: #C0C0C0;
+            text-align: center; 
+            max-width: 800px; 
+            margin: 0 auto 20px auto;
+            text-shadow: none;
+        }
+        
+        /* === TWÓRZENIE GEOMETRYCZNEJ GRAFIKI DLA BLOKÓW === */
+        .dark-theme .content-box::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 0; 
+            opacity: 0.7;
+            width: 500px;
+            height: 300px;
+            transition: transform 0.5s ease, opacity 0.3s ease;
+            pointer-events: none; 
+        }
+
+        /* Definicja grafiki krystalicznej dla Galeria/Gify */
+        .dark-theme #galeria::before {
+            background: linear-gradient(135deg, #00FFFF 0%, #FF00FF 100%);
+            clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%); 
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+            transform: translate(-50%, -50%) rotate(5deg);
+        }
+        
+        .dark-theme #gify::before {
+            background: linear-gradient(45deg, #FF00FF 0%, #00FFFF 100%);
+            clip-path: polygon(0% 20%, 60% 0%, 100% 80%, 40% 100%);
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.5);
+            transform: translate(-50%, -50%) rotate(-5deg);
+        }
+        
+        /* Grafika na hover */
+        .dark-theme .content-box:hover::before {
+            opacity: 1.0;
+            transform: translate(-50%, -50%) scale(1.05) rotate(0deg);
+        }
+        
+        /* Zapewniamy, że treść jest ponad grafiką */
+        .dark-theme .content-box h2,
+        .dark-theme .content-box p,
+        .dark-theme .gallery-grid,
+        .dark-theme .neon-button {
+            position: relative;
+            z-index: 10;
+        }
+
+        .dark-theme .gallery-item img {
+            border: 1px solid rgba(255, 0, 255, 0.2);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+        }
+        
+        /* Styl HR (FUTURYZM) */
+        .dark-theme hr {
+            border: none;
+            height: 1px;
+            margin: 40px auto;
+            width: 80%;
+            background: linear-gradient(90deg, #FF00FF 0%, #00FFFF 100%);
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+            animation: none;
+            border-radius: 0;
+        }
+
+        /* Przyciski i alerty (FUTURYZM) */
+        .dark-theme .neon-button, .dark-theme .theme-toggle-button {
+            background: linear-gradient(45deg, #FF00FF 0%, #00FFFF 100%) !important;
+            color: #121212 !important; 
+            border: none;
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.8);
+            border-radius: 2px;
+            font-weight: 700;
+        }
+        .dark-theme .neon-alert {
+            color: #00FFFF;
+            border: 1px solid rgba(0, 255, 255, 0.5);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+            background: none;
+        }
+        
+        /* Upewnij się, że dekoracje świąteczne są ukryte w motywie czarnym */
+        .dark-theme .christmas-lights, 
+        .dark-theme .content-box h2::before, 
+        .dark-theme .content-box h2::after {
+            display: none !important; 
+        }
+
+        /* ==================================================== */
+        /* === POZOSTAŁE STYLY (WIDGETY, NIEZALEŻNE) === */
+        /* ==================================================== */
+        /* ... (tutaj znajdują się style dla scanlines, snowflake, back-to-top, volume-control) ... */
+        
+        /* === Efekt NEONOWEGO SZUMU (Scanline Overlay) === */
+        .scanlines-overlay { /* ... */ }
+        @keyframes scanlines { /* ... */ }
+
+        /* === STYL I ANIMACJE DLA PŁATKÓW ŚNIEGU === */
+        #snowfall-container { /* ... */ }
+        .snowflake { /* ... */ }
+        @keyframes snowfall { /* ... */ }
+        @keyframes wind-drift { /* ... */ }
+
+        /* === PRZYCISK WRÓĆ NA GÓRĘ (Back to Top) === */
+        #back-to-top { /* ... */ }
+        #back-to-top:hover { /* ... */ }
+        .show-btn { opacity: 1 !important; }
+
+        /* === ŚWIĄTECZNE ŚWIATEŁKA GÓRNE === */
+        .christmas-lights { /* ... */ }
+        .light-bulb { /* ... */ }
+        @keyframes pulse-light { /* ... */ }
+
+    </style>
+</head>
+<body> 
+    <div class="christmas-lights">
+        <div class="light-bulb red"></div><div class="light-bulb blue"></div><div class="light-bulb green"></div><div class="light-bulb purple"></div>
+        <div class="light-bulb red"></div><div class="light-bulb blue"></div><div class="light-bulb green"></div><div class="light-bulb purple"></div>
+        <div class="light-bulb red"></div><div class="light-bulb blue"></div><div class="light-bulb green"></div><div class="light-bulb purple"></div>
+        <div class="light-bulb red"></div><div class="light-bulb blue"></div><div class="light-bulb green"></div><div class="light-bulb purple"></div>
+        <div class="light-bulb red"></div><div class="light-bulb blue"></div><div class="light-bulb green"></div><div class="light-bulb purple"></div>
+        <div class="light-bulb red"></div><div class="light-bulb blue"></div><div class="light-bulb green"></div><div class="light-bulb purple"></div>
+        <div class="light-bulb red"></div><div class="light-bulb blue"></div>
+    </div>
+    <div id="snowfall-container"></div> 
+
+    <header>
+	
+        <h1 class="neon-text" id="top">TO JEST LEPSZE DUO</h1>
+        <p class="neon-text">ZAPISANI NA KARTACH HISTORII OD 31.08.2025</p>
+        
+        <p id="neon-clock" class="neon-text"></p>
+        
+        <p id="visit-counter" class="neon-text" style="font-size: 1.2em; margin-top: 10px;"></p>
+        <p class="neon-alert">
+            Wiesz co z tym zrobić😎 👇
+        </p>
+        
+        <div class="theme-toggle-container">
+            <button id="toggle-glass" class="theme-toggle-button" onclick="setTheme('glass')">
+                🧊 GLASSMORPHISM
+            </button>
+            
+            <button id="toggle-neon" class="theme-toggle-button" onclick="setTheme('neon')">
+                🔮 NEONOWY
+            </button>
+            <button id="toggle-dark" class="theme-toggle-button" onclick="setTheme('dark')">
+                ⚫ CZERŃ/FUTURYZM
+            </button>
+        </div>
+        <div class="volume-control-container">
+            <span class="volume-label">🔇</span>
+            <input type="range" id="volume-slider" min="0" max="100" value="5" oninput="setVolume(this.value)" onclick="playMusic()">
+            <span class="volume-label">🔊</span>
+        </div>
+        
+    </header>
+
+
+    <main>
+    
+        <section id="o-nas" class="content-box">
+            <h2 class="neon-text">✨ WSTĘP</h2>
+            <p>
+                Jeśli kiedykolwiek będziesz miała zły dzień, kliknij suwak na górze i obejrzyj naszą galerię. Jesteśmy lepsi razem.
+            </p>
+        </section>
+        
+        <hr> 
+        
+        <section id="galeria" class="content-box">
+            <h2 class="neon-text">📸 Galeria Wspomnień</h2>
+            <p>
+                Ta sekcja prezentuje nasze ulubione chwile, zorganizowane w futurystyczną siatkę zdjęć, która dostosowuje się do każdego ekranu. Przesuń kursor, aby poczuć energię.
+            </p>
+            <div class="gallery-grid">
+                <div class="gallery-item"><img src="zdjecie_1.jpg" alt="Wspomnienie 1"></div>
+                <div class="gallery-item"><img src="zdjecie_2.jpg" alt="Wspomnienie 2"></div>
+                <div class="gallery-item"><img src="zdjecie_3.jpg" alt="Wspomnienie 3"></div>
+                <div class="gallery-item"><img src="zdjecie_4.jpg" alt="Wspomnienie 4"></div>
+                <div class="gallery-item"><img src="zdjecie_5.jpg" alt="Wspomnienie 5"></div>
+                <div class="gallery-item"><img src="zdjecie_6.jpg" alt="Wspomnienie 6"></div>
+                <div class="gallery-item"><img src="zdjecie_7.jpg" alt="Wspomnienie 7"></div>
+                <div class="gallery-item"><img src="zdjecie_8.jpg" alt="Wspomnienie 8"></div>
+                <div class="gallery-item"><img src="zdjecie_9.jpg" alt="Wspomnienie 9"></div>
+                <div class="gallery-item"><img src="zdjecie_10.jpg" alt="Wspomnienie 10"></div>
+                <div class="gallery-item"><img src="zdjecie_11.jpg" alt="Wspomnienie 11"></div>
+                <div class="gallery-item"><img src="zdjecie_12.jpg" alt="Wspomnienie 12"></div>
+                <div class="gallery-item"><img src="zdjecie_13.jpg" alt="Wspomnienie 13"></div>
+            </div>
+        </section>
+
+        <hr> 
+        
+        <section id="gify" class="content-box">
+            <h2 class="neon-text">💾 Nasze najlepsze gify😎</h2>
+            <p style="text-align: center; color: #F0F0FF; margin-bottom: 25px;">
+                Animowane momenty, które trwają wiecznie.
+            </p>
+            <div class="gallery-grid">
+                <div class="gallery-item"><img src="gif_1.gif" alt="Animowany moment 1"></div>
+                <div class="gallery-item"><img src="gif_2.gif" alt="Animowany moment 2"></div>
+                </div>
+        </section>
+
+        <hr> 
+        
+        <section id="video" class="content-box">
+            <h2 class="neon-text">🎥 NA PAMIĄTKĘ</h2>
+            <p style="text-align: center; color: #F0F0FF; margin-bottom: 25px;">
+                Film, który streszcza tysiąc wspomnień.
+            </p>
+            
+            <div style="text-align: center;">
+                <a href="https://www.youtube.com/watch?v=8kPpHkgS8T4" target="_blank" class="neon-button">
+                    Obejrzyj na YouTube
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p class="neon-text">Stworzone z miłością i fioletowym blaskiem.</p>
+    </footer>
+
+    <div style="display: none;">
+        <audio id="background-audio" loop>
+            <source src="nasza_piosenka.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+    <div class="scanlines-overlay"></div>
+    
+    <a href="#top" id="back-to-top" title="Wróć na Górę">^</a>
+
+    <script>
+        
+        // Ustawiamy domyślny motyw na 'glass' (brak klasy)
+        let currentTheme = 'glass'; 
+
+        // === ZAKTUALIZOWANY SKRYPT DO PRZEŁĄCZANIA MOTYWÓW (3 stany) ===
+        function setTheme(newTheme) {
+            const body = document.body;
+            
+            // 1. Usuń wszystkie możliwe klasy motywów
+            body.classList.remove('neon-theme', 'dark-theme'); 
+            
+            // 2. Dodaj nową klasę motywu, chyba że jest to 'glass' (wtedy nie dodajemy żadnej)
+            if (newTheme === 'neon') {
+                body.classList.add('neon-theme');
+            } else if (newTheme === 'dark') {
+                body.classList.add('dark-theme');
+            }
+            
+            currentTheme = newTheme;
+            localStorage.setItem('theme', currentTheme);
+            updateButtonStyles(); 
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                setTheme(savedTheme);
+            } else {
+                setTheme('glass'); // Ustaw 'glass' jako nowy domyślny
+            }
+        }
+        
+        // Funkcja do aktywnego podświetlania aktualnego przycisku
+        function updateButtonStyles() {
+            const isGlass = currentTheme === 'glass';
+            const isNeon = currentTheme === 'neon';
+            const isDark = currentTheme === 'dark';
+
+            // Podświetlanie aktywnego przycisku (pełna widoczność)
+            document.getElementById('toggle-glass').style.opacity = isGlass ? 1.0 : 0.6;
+            document.getElementById('toggle-neon').style.opacity = isNeon ? 1.0 : 0.6;
+            document.getElementById('toggle-dark').style.opacity = isDark ? 1.0 : 0.6;
+            
+            // Zmiana koloru licznika w zależności od motywu
+            const counterSpan = document.querySelector('#visit-counter span');
+            if (counterSpan) {
+                if (isDark) {
+                    counterSpan.style.color = '#00FFFF'; // Futuryzm
+                } else if (isNeon) {
+                    counterSpan.style.color = '#FF66CC'; // Neon
+                } else {
+                    counterSpan.style.color = '#FFFFFF'; // Glassmorphism
+                }
+            }
+        }
+
+        // --- POZOSTAŁE SKRYPTY (NIEZMIENIONE) ---
+        const titleOriginal = document.title; 
+        const titleAnimated = "TO DOPIERO POCZĄTEK????????"; 
+        let isAnimatedTitle = false;
+
+        function animateTitle() {
+            if (isAnimatedTitle) {
+                document.title = titleOriginal;
+            } else {
+                document.title = titleAnimated;
+            }
+            isAnimatedTitle = !isAnimatedTitle;
+        }
+        setInterval(animateTitle, 2000);
+        
+        
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const dateString = now.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            document.getElementById('neon-clock').textContent = `[${dateString}] // [${timeString}]`;
+        }
+        setInterval(updateClock, 1000); 
+
+        function initVisitCounter() {
+            const storageKey = 'duoVisitCount'; 
+            let count = 0;
+            const storedCount = localStorage.getItem(storageKey);
+
+            if (storedCount) {
+                count = parseInt(storedCount, 10) + 1;
+            } else {
+                count = 1;
+            }
+
+            localStorage.setItem(storageKey, count);
+            const counterElement = document.getElementById('visit-counter');
+            if (counterElement) {
+                counterElement.innerHTML = `🌟 TWÓJ LICZNIK WSPOMNIEŃ: <span>${count}</span> 🌟`;
+            }
+            updateButtonStyles(); 
+        }
+
+        var isPlaying = false; 
+        function playMusic() {
+            if (isPlaying) return; 
+            var audioPlayer = document.getElementById('background-audio');
+            
+            audioPlayer.play().then(function() {
+                isPlaying = true; 
+                setVolume(document.getElementById('volume-slider').value); 
+            }).catch(function(error) {
+                console.error('Błąd odtwarzania audio:', error);
+            });
+        }
+        
+        function setVolume(volumeValue) {
+            var audioPlayer = document.getElementById('background-audio');
+            audioPlayer.volume = volumeValue / 100;
+        }
+        
+        const backToTopButton = document.getElementById("back-to-top");
+        window.onscroll = function() {scrollFunction()};
+        
+        function scrollFunction() {
+            if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+                backToTopButton.classList.add('show-btn');
+            } else {
+                backToTopButton.classList.remove('show-btn');
+            }
+        }
+        
+        const snowfallContainer = document.getElementById('snowfall-container');
+        function generateSnowflakes(count) {
+             for (let i = 0; i < count; i++) {
+                 const snowflake = document.createElement('div');
+                 snowflake.classList.add('snowflake');
+                 const size = Math.random() * 3 + 2; 
+                 snowflake.style.width = `${size}px`;
+                 snowflake.style.height = `${size}px`;
+                 snowflake.style.left = `${Math.random() * 100}vw`;
+                 const fallDuration = Math.random() * 20 + 10; 
+                 snowflake.style.animationDuration = `${fallDuration}s, ${fallDuration / 4}s`;
+                 snowflake.style.animationDelay = `-${Math.random() * fallDuration}s, -${Math.random() * fallDuration}s`;
+                 snowfallContainer.appendChild(snowflake);
+             }
+        }
+
+        window.onload = function() {
+              loadTheme(); 
+              setVolume(document.getElementById('volume-slider').value); 
+              generateSnowflakes(50); 
+              updateClock();
+              initVisitCounter();
+        };
+    </script>
+</body>
+</html>
