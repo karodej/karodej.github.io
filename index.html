@@ -173,34 +173,64 @@
             appId: "1:504984499636:web:37ae30aba2fccaddfeaee1"
         };
 
-        firebase.initializeApp(firebaseConfig);
+firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // 2. OBSŁUGA NOTATEK ONLINE
+        // 2. OBSŁUGA NOTATEK Z KOLORAMI I DATĄ
         function addNote() {
             const input = document.getElementById('note-text');
             if (input.value.trim() === "") return;
+
+            // Pytamy o imię tylko raz - potem przeglądarka pamięta
+            let author = localStorage.getItem('my_name');
+            if (!author) {
+                author = prompt("Jak masz na imię? (To ustali Twój kolor notatek)");
+                if (!author) return;
+                localStorage.setItem('my_name', author);
+            }
+
             db.collection("notatki").add({
                 text: input.value,
+                author: author,
                 time: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => { input.value = ""; });
+            }).then(() => { 
+                input.value = ""; 
+            });
         }
 
+        // Wyświetlanie notatek
         db.collection("notatki").orderBy("time", "desc").onSnapshot((snap) => {
             const list = document.getElementById('notes-list');
             list.innerHTML = "";
+            
             snap.forEach((doc) => {
                 const note = doc.data();
-                list.innerHTML += `<div class="note-card">
-                    <button class="delete-note" onclick="deleteNote('${doc.id}')">×</button>
-                    <p>${note.text}</p>
-                </div>`;
+                const date = note.time ? note.time.toDate().toLocaleString('pl-PL', {
+                    day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                }) : "Wysyłanie...";
+
+                // Ustalamy kolor na podstawie autora
+                // Jeśli autorem jest osoba o imieniu zapisanym w Twoim telefonie, dajemy fioletowy, w innym wypadku błękitny
+                const myName = localStorage.getItem('my_name');
+                const borderColor = (note.author === myName) ? "#A044FF" : "#00FFFF";
+
+                list.innerHTML += `
+                    <div class="note-card" style="border-left: 5px solid ${borderColor}; margin-bottom: 15px;">
+                        <button class="delete-note" onclick="deleteNote('${doc.id}')" style="font-size: 1.2em;">×</button>
+                        <strong style="font-size: 0.8em; color: ${borderColor};">${note.author.toUpperCase()}</strong>
+                        <p style="margin: 5px 0;">${note.text}</p>
+                        <small style="display: block; font-size: 0.7em; opacity: 0.6; text-align: right;">${date}</small>
+                    </div>`;
             });
         });
 
-        function deleteNote(id) { db.collection("notatki").doc(id).delete(); }
+        function deleteNote(id) { 
+            if(confirm("Usunąć tę notatkę?")) {
+                db.collection("notatki").doc(id).delete(); 
+            }
+        }
 
-        // 3. TWOJE FUNKCJE (Zegar, Licznik, Motywy)
+        // === RESZTA TWOICH FUNKCJI (ZEGAR, MOTYWY ITP.) ===
         function updateDuoCounter() {
             const start = new Date('2025-08-31T00:00:00');
             const now = new Date();
@@ -217,21 +247,14 @@
             document.body.classList.remove('neon-theme', 'dark-theme');
             if(t !== 'glass') document.body.classList.add(t + '-theme');
             localStorage.setItem('theme', t);
-            updateButtonStyles(t);
         }
 
-        function updateButtonStyles(t) {
-            document.getElementById('toggle-glass').style.opacity = t === 'glass' ? 1 : 0.6;
-            document.getElementById('toggle-neon').style.opacity = t === 'neon' ? 1 : 0.6;
-            document.getElementById('toggle-dark').style.opacity = t === 'dark' ? 1 : 0.6;
-        }
-
-        // Tytuł, śnieg, muzyka
         var isPlaying = false;
         function playMusic() { if(!isPlaying) { document.getElementById('background-audio').play(); isPlaying = true; } }
         function setVolume(v) { document.getElementById('background-audio').volume = v/100; }
 
         function snow() {
+            const container = document.getElementById('snowfall-container');
             for(let i=0; i<40; i++) {
                 const s = document.createElement('div');
                 s.className = 'snowflake';
@@ -239,22 +262,15 @@
                 s.style.left = Math.random()*100+'vw';
                 s.style.animationDuration = (Math.random()*15+10)+'s';
                 s.style.animationDelay = `-${Math.random()*10}s`;
-                document.getElementById('snowfall-container').appendChild(s);
+                container.appendChild(s);
             }
         }
-
-        window.onscroll = () => {
-            const btn = document.getElementById('back-to-top');
-            if(window.scrollY > 300) btn.classList.add('show-btn');
-            else btn.classList.remove('show-btn');
-        };
 
         window.onload = () => {
             const saved = localStorage.getItem('theme') || 'glass';
             setTheme(saved);
             updateDuoCounter();
             snow();
-            // Licznik odwiedzin
             let visits = parseInt(localStorage.getItem('vCount') || 0) + 1;
             localStorage.setItem('vCount', visits);
             document.getElementById('visit-counter').innerHTML = `🌟 WSPOMNIENIE NR: ${visits}`;
