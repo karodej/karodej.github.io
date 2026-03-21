@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
@@ -86,40 +86,6 @@
             cursor: pointer;
         }
 
-        /* === STYLE DLA NOTATEK (DODANE ELEMENTY) === */
-        .note-input-container {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        #note-text {
-            flex: 1;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(255,255,255,0.1);
-            color: white;
-        }
-        .note-card {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            text-align: left;
-            border-left: 5px solid #A044FF;
-            position: relative;
-        }
-        .delete-note {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: none;
-            border: none;
-            color: #ff4d4d;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
         /* ================================================= */
         /* === MOTYW 1: GLASSMORPHISM (DOMYŚLNY - BRAK KLASY) === */
         /* ================================================= */
@@ -190,11 +156,9 @@
             z-index: -1; 
         }
         
-        @keyframes neon-flicker {
-            0%, 19.999%, 22%, 62.999%, 64%, 64.999%, 70%, 100% { opacity: 1; }
-            20%, 21.999%, 63%, 63.999%, 65%, 69.999% { opacity: 0.4; }
-        }
-
+        /* ... pozostałe style .neon-theme ... */
+        @keyframes neon-flicker { /* ... */ }
+        .neon-theme header h1 { /* ... */ animation: neon-flicker 4s infinite alternate; /* ... */ }
         .neon-theme h1, .neon-theme h2, .neon-theme .neon-text {
             text-shadow: 0 0 5px #E66FFF, 0 0 15px #E66FFF, 0 0 40px rgba(230, 111, 255, 0.9);
             color: #FFFFFF; 
@@ -204,18 +168,15 @@
         }
         
         /* STYLA KONTENERÓW I RAMKÓW Z ANIMACJĄ PULSACJI */
-        @keyframes neon-pulse {
-            from { box-shadow: 0 0 10px #CC33FF, inset 0 0 5px #CC33FF; }
-            to { box-shadow: 0 0 25px #CC33FF, inset 0 0 10px #CC33FF; }
-        }
-
+        @keyframes neon-pulse { /* ... */ }
         .neon-theme .content-box {
             background-color: rgba(0, 0, 15, 0.10); 
             border: 2px solid #CC33FF; 
             padding: 30px;
             margin-bottom: 30px;
             border-radius: 10px;
-            animation: neon-pulse 1.5s infinite alternate; 
+            animation: neon-pulse 10s infinite alternate; 
+            /* ... */
         }
 
         /* === STYL PRZYCISKU (NEON) nadpisuje domyślny .theme-toggle-button === */
@@ -228,8 +189,10 @@
             border-radius: 50px;
         }
         
+        /* ... inne style neon-theme (galeria, hr, dekoracje) ... */
         .neon-theme .gallery-item img { border: 1px solid #CC33FF; box-shadow: 0 0 8px #CC33FF; }
-        .neon-theme hr { border: 1px solid #CC33FF; box-shadow: 0 0 10px #CC33FF; }
+        .neon-theme hr { /* ... */ animation: hr-flicker 2s infinite alternate; }
+        .neon-theme .christmas-lights, .neon-theme .content-box h2::before, .neon-theme .content-box h2::after { display: block; }
 
         /* ================================================= */
         /* === MOTYW 3: CZERŃ/FUTURYZM (.dark-theme) === */
@@ -379,80 +342,38 @@
             box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
             background: none;
         }
+        
+        /* Upewnij się, że dekoracje świąteczne są ukryte w motywie czarnym */
+        .dark-theme .christmas-lights, 
+        .dark-theme .content-box h2::before, 
+        .dark-theme .content-box h2::after {
+            display: none !important; 
+        }
 
         /* ==================================================== */
         /* === POZOSTAŁE STYLY (WIDGETY, NIEZALEŻNE) === */
         /* ==================================================== */
-        .scanlines-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            z-index: 999;
-            pointer-events: none;
-            background-size: 100% 4px, 3px 100%;
-        }
+        /* ... (tutaj znajdują się style dla scanlines, snowflake, back-to-top, volume-control) ... */
+        
+        /* === Efekt NEONOWEGO SZUMU (Scanline Overlay) === */
+        .scanlines-overlay { /* ... */ }
+        @keyframes scanlines { /* ... */ }
 
-        #snowfall-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            pointer-events: none;
-        }
-        .snowflake {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
-            opacity: 0.8;
-            animation: snowfall linear infinite, wind-drift ease-in-out infinite;
-        }
-        @keyframes snowfall { 0% { transform: translateY(-10vh); } 100% { transform: translateY(110vh); } }
-        @keyframes wind-drift { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(20px); } }
+        /* === STYL I ANIMACJE DLA PŁATKÓW ŚNIEGU === */
+        #snowfall-container { /* ... */ }
+        .snowflake { /* ... */ }
+        @keyframes snowfall { /* ... */ }
+        @keyframes wind-drift { /* ... */ }
 
-        #back-to-top {
-            position: fixed;
-            bottom: 25px;
-            right: 25px;
-            width: 50px;
-            height: 50px;
-            background: rgba(160, 68, 255, 0.6);
-            color: white;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 50px;
-            font-size: 24px;
-            text-decoration: none;
-            z-index: 100;
-            opacity: 0;
-            transition: all 0.3s;
-        }
+        /* === PRZYCISK WRÓĆ NA GÓRĘ (Back to Top) === */
+        #back-to-top { /* ... */ }
+        #back-to-top:hover { /* ... */ }
         .show-btn { opacity: 1 !important; }
 
-        .christmas-lights {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            height: 20px;
-            display: flex;
-            justify-content: space-around;
-            z-index: 100;
-        }
-        .light-bulb {
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            animation: pulse-light 1.5s infinite alternate;
-        }
-        @keyframes pulse-light { from { opacity: 0.5; transform: scale(0.8); } to { opacity: 1; transform: scale(1.1); } }
-        .red { background: #ff0000; box-shadow: 0 0 10px #ff0000; }
-        .blue { background: #0000ff; box-shadow: 0 0 10px #0000ff; }
-        .green { background: #00ff00; box-shadow: 0 0 10px #00ff00; }
-        .purple { background: #a044ff; box-shadow: 0 0 10px #a044ff; }
+        /* === ŚWIĄTECZNE ŚWIATEŁKA GÓRNE === */
+        .christmas-lights { /* ... */ }
+        .light-bulb { /* ... */ }
+        @keyframes pulse-light { /* ... */ }
 
     </style>
 </head>
@@ -469,7 +390,7 @@
     <div id="snowfall-container"></div> 
 
     <header>
-    
+	
         <h1 class="neon-text" id="top">TO JEST LEPSZE DUO</h1>
         <p class="neon-text">ZAPISANI NA KARTACH HISTORII OD 31.08.2025</p>
         <div id="duo-counter">
@@ -505,15 +426,6 @@
 
     <main>
     
-        <section id="nasze-notatki" class="content-box">
-            <h2 class="neon-text">📝 NASZE NOTATKI</h2>
-            <div class="note-input-container">
-                <input type="text" id="note-text" placeholder="Napisz coś...">
-                <button class="theme-toggle-button" onclick="addNote()">DODAJ</button>
-            </div>
-            <div id="notes-list"></div>
-        </section>
-
         <section id="o-nas" class="content-box">
             <h2 class="neon-text">✨ WSTĘP</h2>
             <p>
@@ -542,20 +454,20 @@
                 <div class="gallery-item"><img src="zdjecie_11.jpg" alt="Wspomnienie 11"></div>
                 <div class="gallery-item"><img src="zdjecie_12.jpg" alt="Wspomnienie 12"></div>
                 <div class="gallery-item"><img src="zdjecie_13.jpg" alt="Wspomnienie 13"></div>
-                <div class="gallery-item"><img src="zdjecie_14.jpg" alt="Wspomnienie 14"></div>
-                <div class="gallery-item"><img src="zdjecie_15.jpg" alt="Wspomnienie 15"></div>
-                <div class="gallery-item"><img src="zdjecie_16.jpg" alt="Wspomnienie 16"></div>
-                <div class="gallery-item"><img src="zdjecie_17.jpg" alt="Wspomnienie 17"></div>
-                <div class="gallery-item"><img src="zdjecie_18.jpg" alt="Wspomnienie 18"></div>
-                <div class="gallery-item"><img src="zdjecie_19.jpg" alt="Wspomnienie 19"></div>
-                <div class="gallery-item"><img src="zdjecie_20.jpg" alt="Wspomnienie 20"></div>
-                <div class="gallery-item"><img src="zdjecie_21.jpg" alt="Wspomnienie 21"></div>
-                <div class="gallery-item"><img src="zdjecie_22.jpg" alt="Wspomnienie 22"></div>
-                <div class="gallery-item"><img src="zdjecie_23.jpg" alt="Wspomnienie 23"></div>
-                <div class="gallery-item"><img src="zdjecie_24.jpg" alt="Wspomnienie 24"></div>
-                <div class="gallery-item"><img src="zdjecie_25.jpg" alt="Wspomnienie 25"></div>
-                <div class="gallery-item"><img src="zdjecie_26.jpg" alt="Wspomnienie 26"></div>
-                <div class="gallery-item"><img src="zdjecie_27.jpg" alt="Wspomnienie 27"></div>
+				<div class="gallery-item"><img src="zdjecie_14.jpg" alt="Wspomnienie 14"></div>
+				<div class="gallery-item"><img src="zdjecie_15.jpg" alt="Wspomnienie 15"></div>
+				<div class="gallery-item"><img src="zdjecie_16.jpg" alt="Wspomnienie 16"></div>
+				<div class="gallery-item"><img src="zdjecie_17.jpg" alt="Wspomnienie 17"></div>
+				<div class="gallery-item"><img src="zdjecie_18.jpg" alt="Wspomnienie 18"></div>
+								<div class="gallery-item"><img src="zdjecie_19.jpg" alt="Wspomnienie 19"></div>
+												<div class="gallery-item"><img src="zdjecie_20.jpg" alt="Wspomnienie 20"></div>
+																<div class="gallery-item"><img src="zdjecie_21.jpg" alt="Wspomnienie 21"></div>
+																				<div class="gallery-item"><img src="zdjecie_22.jpg" alt="Wspomnienie 22"></div>
+																				<div class="gallery-item"><img src="zdjecie_23.jpg" alt="Wspomnienie 23"></div>
+																				<div class="gallery-item"><img src="zdjecie_24.jpg" alt="Wspomnienie 24"></div>
+																				<div class="gallery-item"><img src="zdjecie_25.jpg" alt="Wspomnienie 25"></div>
+																				<div class="gallery-item"><img src="zdjecie_26.jpg" alt="Wspomnienie 26"></div>
+																				<div class="gallery-item"><img src="zdjecie_27.jpg" alt="Wspomnienie 27"></div>
 
             </div>
         </section>
@@ -565,12 +477,12 @@
         <section id="gify" class="content-box">
             <h2 class="neon-text">💾 Nasze najlepsze gify😎</h2>
             <p style="text-align: center; color: #F0F0FF; margin-bottom: 25px;">
-                    RAZEM JE UWIELBIAMY🤠
+					RAZEM JE UWIELBIAMY🤠
             </p>
             <div class="gallery-grid">
                 <div class="gallery-item"><img src="gif_1.gif" alt="Animowany moment 1"></div>
                 <div class="gallery-item"><img src="gif_2.gif" alt="Animowany moment 2"></div>
-                <div class="gallery-item"><img src="gif_3.gif" alt="Animowany moment 3"></div>
+				<div class="gallery-item"><img src="gif_3.gif" alt="Animowany moment 3"></div>
                 </div>
         </section>
 
@@ -586,15 +498,15 @@
                 <a href="https://www.youtube.com/watch?v=8kPpHkgS8T4" target="_blank" class="neon-button">
                     NASZ PIERWSZY FILMIK
                 </a>
-                  <h2 class="neon-text">🎥 ✨ Nowe wspomnienia.</h2>
-                 <p style="text-align: center; color: #F0F0FF; margin-bottom: 25px;">
+				  <h2 class="neon-text">🎥 ✨ Nowe wspomnienia.</h2>
+				 <p style="text-align: center; color: #F0F0FF; margin-bottom: 25px;">
         
             </p>
             
-                 <a href="https://youtu.be/o4NP4_WrYFs" target="_blank" class="neon-button">
+				 <a href="https://youtu.be/o4NP4_WrYFs" target="_blank" class="neon-button">
                     A TUTAJ DRUGI FILMIK
                 </a>
-                           <h2 class="neon-text">🎥 MY CUDOWNI.....</h2>
+				           <h2 class="neon-text">🎥 MY CUDOWNI.....</h2>
             <p style="text-align: center; color: #F0F0FF; margin-bottom: 25px;">
                 UWIELBIAM CIE
             </p>
@@ -603,10 +515,10 @@
                 <a href="https://youtu.be/xld9Df7UfGU" target="_blank" class="neon-button">
                     KC, OBEJRZYJ TUTAJ
                 </a>
-                
+				
             </div>
         </section>
-        
+		
 
     </main>
 
@@ -618,14 +530,57 @@
         <audio id="background-audio" loop>
             <source src="nasza_piosenka.mp3" type="audio/mpeg">
         </audio>
-        
+		
+    <script>
+        // ==========================================
+        // KONFIGURACJA FIREBASE
+        // ==========================================
+const firebaseConfig = {
+  apiKey: "AIzaSyAJr96Nb1ypYBY7fpqqkjHcuZjW7b6l74c",
+  authDomain: "naszeduo-1efce.firebaseapp.com",
+  projectId: "naszeduo-1efce",
+  storageBucket: "naszeduo-1efce.firebasestorage.app",
+  messagingSenderId: "504984499636",
+  appId: "1:504984499636:web:37ae30aba2fccaddfeaee1"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // DODAWANIE NOTATKI DO BAZY
+        function addNote() {
+            const input = document.getElementById('note-text');
+            if (input.value.trim() === "") return;
+            db.collection("notatki").add({
+                text: input.value,
+                time: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => { input.value = ""; });
+        }
+
+        // POBIERANIE NOTATEK NA ŻYWO (U OBOJGA)
+        db.collection("notatki").orderBy("time", "desc").onSnapshot((snap) => {
+            const list = document.getElementById('notes-list');
+            list.innerHTML = "";
+            snap.forEach((doc) => {
+                const note = doc.data();
+                const div = document.createElement('div');
+                div.className = 'note-card';
+                div.innerHTML = `<button class="delete-note" onclick="deleteNote('${doc.id}')">×</button><p>${note.text}</p>`;
+                list.appendChild(div);
+            });
+        });
+
+        function deleteNote(id) {
+            db.collection("notatki").doc(id).delete();
+        }
+
     </div>
     <div class="scanlines-overlay"></div>
     
     <a href="#top" id="back-to-top" title="Wróć na Górę">^</a>
 
     <script>
-            // LICZNIK DUO
+	        // LICZNIK DUO
         function updateDuoCounter() {
             const startDate = new Date('2025-08-31T00:00:00');
             const now = new Date();
@@ -693,38 +648,6 @@
                     counterSpan.style.color = '#FFFFFF'; // Glassmorphism
                 }
             }
-        }
-
-        // === SKRYPT DLA NOTATEK (DODANY) ===
-        function addNote() {
-            const noteInput = document.getElementById('note-text');
-            const noteText = noteInput.value.trim();
-            if (noteText === "") return;
-
-            const notes = JSON.parse(localStorage.getItem('userNotes') || "[]");
-            notes.push(noteText);
-            localStorage.setItem('userNotes', JSON.stringify(notes));
-            
-            noteInput.value = "";
-            renderNotes();
-        }
-
-        function renderNotes() {
-            const notesList = document.getElementById('notes-list');
-            const notes = JSON.parse(localStorage.getItem('userNotes') || "[]");
-            notesList.innerHTML = notes.map((note, index) => `
-                <div class="note-card">
-                    <button class="delete-note" onclick="deleteNote(${index})">×</button>
-                    <p>${note}</p>
-                </div>
-            `).join('');
-        }
-
-        function deleteNote(index) {
-            const notes = JSON.parse(localStorage.getItem('userNotes') || "[]");
-            notes.splice(index, 1);
-            localStorage.setItem('userNotes', JSON.stringify(notes));
-            renderNotes();
         }
 
         // --- POZOSTAŁE SKRYPTY (NIEZMIENIONE) ---
@@ -817,7 +740,6 @@
 
         window.onload = function() {
               loadTheme(); 
-              renderNotes();
               setVolume(document.getElementById('volume-slider').value); 
               generateSnowflakes(50); 
               updateClock();
