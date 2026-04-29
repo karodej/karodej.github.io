@@ -122,6 +122,41 @@
             cursor: pointer;
             font-weight: bold;
         }
+        /* Panel statystyk odwiedzin */
+.visit-stats {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    text-align: left;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-label {
+    color: #888;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.stat-value {
+    color: #bb86fc;
+    font-weight: bold;
+}
+
+.last-user-blue { color: #00d2ff; }
+.last-user-pink { color: #ff0077; }
 /* Styl dla daty i godziny nad tekstem */
 .note-metadata {
     display: block;
@@ -554,6 +589,16 @@
         <span class="logo-letter letter-k">K</span>
     </div>
 </div>
+        <section class="visit-stats">
+    <div class="stat-item">
+        <span class="stat-label">Ostatnio był/a</span>
+        <span id="last-visitor" class="stat-value">Ładowanie...</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-label">Wyświetlenia</span>
+        <span id="view-counts" class="stat-value">D: 0 | K: 0</span>
+    </div>
+</section>
         <p class="neon-text">ZAPISANI NA KARTACH HISTORII OD 31.08.2025</p>
         <div id="duo-counter">
             <p id="love-clock" class="neon-text" style="font-weight: bold; font-size: 1.1em; margin: 0;"></p>
@@ -946,6 +991,72 @@ function listenToNotes() {
               updateClock();
               initVisitCounter();
         };
+        // --- SYSTEM ŚLEDZENIA ODWIEDZIN ---
+
+function trackVisit() {
+    // 1. Sprawdzamy czy już wiemy kto to (żeby nie pytać przy każdym odświeżeniu w tej samej sesji)
+    let currentUser = sessionStorage.getItem('visitor_name');
+
+    if (!currentUser) {
+        currentUser = prompt("Kto przegląda stronę? (Damian / Karolina)");
+        if (currentUser) {
+            sessionStorage.setItem('visitor_name', currentUser);
+        } else {
+            currentUser = "Anonim";
+        }
+    }
+
+    // 2. Aktualizacja danych w Firebase
+    const userKey = currentUser.toLowerCase();
+    if (userKey === "damian" || userKey === "karolina") {
+        const statsRef = db.collection("stats").doc(userKey);
+        
+        statsRef.set({
+            name: currentUser,
+            lastVisit: firebase.firestore.FieldValue.serverTimestamp(),
+            views: firebase.firestore.FieldValue.increment(1)
+        }, { merge: true });
+
+        // Ustawiamy globalny dokument "ostatni gość"
+        db.collection("stats").doc("global").set({
+            lastPerson: currentUser,
+            lastTime: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+    }
+}
+
+function listenToStats() {
+    // Słuchanie statystyk w czasie rzeczywistym
+    db.collection("stats").onSnapshot((snapshot) => {
+        let counts = { damian: 0, karolina: 0 };
+        let lastPerson = "...";
+        let lastTime = "";
+
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            if (doc.id === "damian") counts.damian = data.views || 0;
+            if (doc.id === "karolina") counts.karolina = data.views || 0;
+            if (doc.id === "global") {
+                lastPerson = data.lastPerson;
+                if (data.lastTime) {
+                    const dt = data.lastTime.toDate();
+                    lastTime = dt.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+                }
+            }
+        });
+
+        // Wyświetlanie w HTML
+        const visitorElement = document.getElementById('last-visitor');
+        visitorElement.innerText = `${lastPerson} (o ${lastTime})`;
+        visitorElement.className = "stat-value " + (lastPerson.toLowerCase() === 'damian' ? 'last-user-blue' : 'last-user-pink');
+        
+        document.getElementById('view-counts').innerText = `D: ${counts.damian} | K: ${counts.karolina}`;
+    });
+}
+
+// Odpalenie funkcji (dodaj to do swojego window.onload)
+trackVisit();
+listenToStats();
     </script>
 </body>
 </html>
