@@ -11,6 +11,21 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
     <style>
+        /* Ukrywamy standardowy kursor na całej stronie */
+body { cursor: none; }
+
+#custom-cursor {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #bb86fc;
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none; /* Żeby nie przeszkadzał w klikaniu */
+    z-index: 9999;
+    box-shadow: 0 0 15px #bb86fc, 0 0 5px #bb86fc inset;
+    transition: transform 0.1s ease-out;
+    transform: translate(-50%, -50%);
+}
         /* ======================================= */
         /* === 1. STYLE GLOBALNE I PODSTAWOWE === */
         /* ======================================= */
@@ -584,6 +599,7 @@
     </style>
 </head>
 <body> 
+    <div id="custom-cursor"></div>
     <div class="christmas-lights">
         <div class="light-bulb red"></div><div class="light-bulb blue"></div><div class="light-bulb green"></div><div class="light-bulb purple"></div>
         <div class="light-bulb red"></div><div class="light-bulb blue"></div><div class="light-bulb green"></div><div class="light-bulb purple"></div>
@@ -768,6 +784,17 @@
     <a href="#top" id="back-to-top" title="Wróć na Górę">^</a>
 
     <script>
+        const cursor = document.getElementById('custom-cursor');
+document.addEventListener('mousemove', (e) => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top = e.clientY + 'px';
+});
+
+// Efekt powiększenia przy najechaniu na przyciski
+document.querySelectorAll('button, a, .note-card').forEach(item => {
+    item.addEventListener('mouseenter', () => cursor.style.transform = 'translate(-50%, -50%) scale(2)');
+    item.addEventListener('mouseleave', () => cursor.style.transform = 'translate(-50%, -50%) scale(1)');
+});
         // === KONFIGURACJA FIREBASE (WKLEJ SWOJE DANE TUTAJ) ===
         const firebaseConfig = {
             apiKey: "AIzaSyAJr96Nb1ypYBY7fpqqkjHcuZjW7b6l74c",
