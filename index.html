@@ -11,6 +11,57 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
     <style>
+	/* Kontener dla całej siatki wideo */
+.video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    margin-top: 30px;
+}
+
+/* Karta pojedynczego filmu */
+.video-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 15px;
+    transition: all 0.4s ease;
+}
+
+.video-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(187, 134, 252, 0.2);
+    border-color: #bb86fc;
+}
+
+/* Responsywne proporcje wideo (16:9) */
+.video-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; /* Proporcja 16:9 */
+    height: 0;
+    overflow: hidden;
+    border-radius: 12px;
+    margin-bottom: 15px;
+}
+
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.video-title {
+    color: #F0F0FF;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 5px;
+}
         /* Ukrywamy standardowy kursor na całej stronie */
 body { cursor: none; }
 
@@ -735,36 +786,46 @@ body { cursor: none; }
 
         <hr> 
         
-        <section id="video" class="content-box">
-            <h2 class="neon-text">🎥 NA PAMIĄTKĘ</h2>
-            <p style="text-align: center; color: #F0F0FF; margin-bottom: 25px;">
-                Film, który streszcza tysiąc wspomnień.
-            </p>
-            
-            <div style="text-align: center;">
-                <a href="https://www.youtube.com/watch?v=8kPpHkgS8T4" target="_blank" class="neon-button">
-                    NASZ PIERWSZY FILMIK
-                </a>
-                  <h2 class="neon-text">🎥 ✨ Nowe wspomnienia.</h2>
-                 <p style="text-align: center; color: #F0F0FF; margin-bottom: 25px;">
-        
-            </p>
-            
-                 <a href="https://youtu.be/o4NP4_WrYFs" target="_blank" class="neon-button">
-                    A TUTAJ DRUGI FILMIK
-                </a>
-                           <h2 class="neon-text">🎥 MY CUDOWNI.....</h2>
-            <p style="text-align: center; color: #F0F0FF; margin-bottom: 25px;">
-                UWIELBIAM CIE
-            </p>
-            
-            <div style="text-align: center;">
-                <a href="https://youtu.be/xld9Df7UfGU" target="_blank" class="neon-button">
-                    KC, OBEJRZYJ TUTAJ
-                </a>
-                
+ <section id="video" class="content-box">
+    <h2 class="neon-text">🎥 NASZA FILMOTEKA</h2>
+    <p style="text-align: center; color: #F0F0FF; margin-bottom: 25px;">
+        Wspomnienia uchwycone w kadrze – tylko dla naszych oczu.
+    </p>
+
+    <div class="video-grid">
+        <!-- Film 1 -->
+        <div class="video-card">
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/8kPpHkgS8T4" allowfullscreen></iframe>
             </div>
-        </section>
+            <div class="video-title">Nasza pierwsza pamiątka...️</div>
+        </div>
+
+        <!-- Film 2 -->
+        <div class="video-card">
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/Bp5wpUGrMak" allowfullscreen></iframe>
+            </div>
+            <div class="video-title">My cudowni:))) </div>
+        </div>
+
+        <!-- Film 3 -->
+        <div class="video-card">
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/xld9Df7UfGU" allowfullscreen></iframe>
+            </div>
+            <div class="video-title">Wiesz, że Cię uwielbiam????</div>
+        </div>
+
+        <!-- Film 4 -->
+        <div class="video-card">
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/o4NP4_WrYFs" allowfullscreen></iframe>
+            </div>
+            <div class="video-title">Najlepsi... 🥂</div>
+        </div>
+    </div>
+</section>
         
 
     </main>
