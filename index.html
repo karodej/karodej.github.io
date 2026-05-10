@@ -1128,25 +1128,7 @@ function trackVisit() {
     }
 }
 
-function listenToStats() {
-    // Słuchanie statystyk w czasie rzeczywistym
-    db.collection("stats").onSnapshot((snapshot) => {
-        let counts = { damian: 0, karolina: 0 };
-        let lastPerson = "...";
-        let lastTime = "";
-
-        snapshot.forEach((doc) => {
-            const data = doc.data();
-            if (doc.id === "damian") counts.damian = data.views || 0;
-            if (doc.id === "karolina") counts.karolina = data.views || 0;
-            if (doc.id === "global") {
-                lastPerson = data.lastPerson;
-                if (data.lastTime) {
-                    const dt = data.lastTime.toDate();
-                    lastTime = dt.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
-                }
-            }
-        });
+}
 
         // Wyświetlanie w HTML
         const visitorElement = document.getElementById('last-visitor');
