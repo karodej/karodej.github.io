@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NAJLEPSZE DUO</title>
@@ -12,59 +11,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
     <style>
-	/* === STYL DLA NEONOWYCH SERC === */
-.heart-string {
-    /* ... reszta stylów ... */
-    cursor: none; /* Ukrywamy systemową strzałkę na pasku */
-}
-
-.neon-heart {
-    font-size: 30px; /* Rozmiar serca */
-    cursor: default;
-    user-select: none;
-    transition: all 0.3s ease;
-    /* Domyślny neon (biały) */
-    color: #fff;
-    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #fff;
-    
-    /* Animacja migotania */
-    animation: pulseHeart 3s infinite alternate;
-}
-
-/* Kolor dla Damiana (Niebieski Neon) */
-.damian-heart {
-    color: #82b1ff;
-    text-shadow: 0 0 5px #fff, 0 0 10px #82b1ff, 0 0 20px #82b1ff, 0 0 30px #82b1ff, 0 0 40px #82b1ff;
-    animation-delay: 0.5s; /* Migocze w innym czasie */
-}
-
-/* Kolor dla Karoliny (Różowy/Neon) */
-.karolina-heart {
-    color: #ff80ab;
-    text-shadow: 0 0 5px #fff, 0 0 10px #ff80ab, 0 0 20px #ff80ab, 0 0 30px #ff80ab, 0 0 40px #ff80ab;
-    animation-delay: 0s;
-}
-
-/* Efekt najazdu myszką - serce rośnie i świeci mocniej */
-.neon-heart {
-    /* ... reszta stylów ... */
-    cursor: none; /* Ukrywamy systemową strzałkę na sercach */
-}
-
-/* Animacja pulsowania/migotania neonu */
-@keyframes pulseHeart {
-    0%, 100% {
-        opacity: 1;
-        transform: scale(1);
-    }
-    50% {
-        opacity: 0.8; /* Delikatne przygaśnięcie */
-        transform: scale(0.95); /* Delikatne zmniejszenie */
-    }
-    80% {
-        opacity: 0.9;
-    }
-}
 	/* Kontener dla całej siatki wideo */
 .video-grid {
     display: grid;
@@ -126,7 +72,7 @@ body { cursor: none; }
     border-radius: 50%;
     position: fixed;
     pointer-events: none; /* Żeby nie przeszkadzał w klikaniu */
-    z-index: 100000;
+    z-index: 9999;
     box-shadow: 0 0 15px #bb86fc, 0 0 5px #bb86fc inset;
     transition: transform 0.1s ease-out;
     transform: translate(-50%, -50%);
@@ -704,16 +650,17 @@ body { cursor: none; }
     </style>
 </head>
 <body> 
-<div class="heart-string">
-    <span class="neon-heart damian-heart">♥</span>
-    <span class="neon-heart karolina-heart">♥</span>
-    <span class="neon-heart damian-heart">♥</span>
-    <span class="neon-heart karolina-heart">♥</span>
-    <span class="neon-heart damian-heart">♥</span>
-    <span class="neon-heart karolina-heart">♥</span>
-    <span class="neon-heart damian-heart">♥</span>
-    <span class="neon-heart karolina-heart">♥</span>
-</div>
+    <div id="custom-cursor"></div>
+    <div class="christmas-lights">
+        <div class="light-bulb red"></div><div class="light-bulb blue"></div><div class="light-bulb green"></div><div class="light-bulb purple"></div>
+        <div class="light-bulb red"></div><div class="light-bulb blue"></div><div class="light-bulb green"></div><div class="light-bulb purple"></div>
+        <div class="light-bulb red"></div><div class="light-bulb blue"></div><div class="light-bulb green"></div><div class="light-bulb purple"></div>
+        <div class="light-bulb red"></div><div class="light-bulb blue"></div><div class="light-bulb green"></div><div class="light-bulb purple"></div>
+        <div class="light-bulb red"></div><div class="light-bulb blue"></div><div class="light-bulb green"></div><div class="light-bulb purple"></div>
+        <div class="light-bulb red"></div><div class="light-bulb blue"></div><div class="light-bulb green"></div><div class="light-bulb purple"></div>
+        <div class="light-bulb red"></div><div class="light-bulb blue"></div>
+    </div>
+    <div id="snowfall-container"></div> 
 
     <header>
     
