@@ -833,9 +833,7 @@ body { cursor: none; }
     <footer>
         <p class="neon-text">Stworzone z miłością i fioletowym blaskiem.</p>
     </footer>
-<div id="global-counter-box" style="margin-top: 10px; font-size: 0.8em; opacity: 0.7;">
-    Łączna liczba wszystkich odwiedzin: <span id="total-global-views">0</span>
-</div>
+
     <div style="display: none;">
         <audio id="background-audio" loop>
             <source src="nasza_piosenka.mp3" type="audio/mpeg">
@@ -1095,8 +1093,6 @@ function listenToNotes() {
               generateSnowflakes(50); 
               updateClock();
               initVisitCounter();
-			trackVisit();      // Twoje obecne śledzenie
-    listenToStats();   // Twoje obecne statystyki
         };
         // --- SYSTEM ŚLEDZENIA ODWIEDZIN ---
 
@@ -1164,28 +1160,6 @@ function listenToStats() {
 // Odpalenie funkcji (dodaj to do swojego window.onload)
 trackVisit();
 listenToStats();
-		// ODDZIELNY KOD DO LICZNIKA W TLE
-function trackGlobalVisit() {
-    // Zwiększamy licznik globalny przy każdym odświeżeniu
-    const globalRef = db.collection("stats").doc("global_total_visits");
-    
-    globalRef.set({
-        count: firebase.firestore.FieldValue.increment(1)
-    }, { merge: true });
-}
-
-function listenToGlobalCounter() {
-    db.collection("stats").doc("global_total_visits").onSnapshot((doc) => {
-        const counterElement = document.getElementById('total-global-views');
-        if (counterElement && doc.exists) {
-            counterElement.innerText = doc.data().count;
-        }
-    });
-}
-
-// Dodaj te wywołania do swojego window.onload:
-// trackGlobalVisit();
-// listenToGlobalCounter();
     </script>
 </body>
 </html>
