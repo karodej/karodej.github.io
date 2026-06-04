@@ -844,18 +844,19 @@ body { cursor: none; }
     
     <a href="#top" id="back-to-top" title="Wróć na Górę">^</a>
 
-<script>
+    <script>
         const cursor = document.getElementById('custom-cursor');
-        document.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-        });
+document.addEventListener('mousemove', (e) => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top = e.clientY + 'px';
+});
 
-        document.querySelectorAll('button, a, .note-card').forEach(item => {
-            item.addEventListener('mouseenter', () => cursor.style.transform = 'translate(-50%, -50%) scale(2)');
-            item.addEventListener('mouseleave', () => cursor.style.transform = 'translate(-50%, -50%) scale(1)');
-        });
-
+// Efekt powiększenia przy najechaniu na przyciski
+document.querySelectorAll('button, a, .note-card').forEach(item => {
+    item.addEventListener('mouseenter', () => cursor.style.transform = 'translate(-50%, -50%) scale(2)');
+    item.addEventListener('mouseleave', () => cursor.style.transform = 'translate(-50%, -50%) scale(1)');
+});
+        // === KONFIGURACJA FIREBASE (WKLEJ SWOJE DANE TUTAJ) ===
         const firebaseConfig = {
             apiKey: "AIzaSyAJr96Nb1ypYBY7fpqqkjHcuZjW7b6l74c",
             authDomain: "naszeduo-1efce.firebaseapp.com",
@@ -865,9 +866,11 @@ body { cursor: none; }
             appId: "1:504984499636:web:37ae30aba2fccaddfeaee1"
         };
         
+        // Inicjalizacja Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+        // LICZNIK DUO
         function updateDuoCounter() {
             const startDate = new Date('2025-08-31T00:00:00');
             const now = new Date();
@@ -881,13 +884,24 @@ body { cursor: none; }
         }
         setInterval(updateDuoCounter, 1000);
 
+        
+        // Ustawiamy domyślny motyw na 'glass' (brak klasy)
         let currentTheme = 'glass'; 
 
+        // === ZAKTUALIZOWANY SKRYPT DO PRZEŁĄCZANIA MOTYWÓW (3 stany) ===
         function setTheme(newTheme) {
             const body = document.body;
+            
+            // 1. Usuń wszystkie możliwe klasy motywów
             body.classList.remove('neon-theme', 'dark-theme'); 
-            if (newTheme === 'neon') body.classList.add('neon-theme');
-            else if (newTheme === 'dark') body.classList.add('dark-theme');
+            
+            // 2. Dodaj nową klasę motywu, chyba że jest to 'glass' (wtedy nie dodajemy żadnej)
+            if (newTheme === 'neon') {
+                body.classList.add('neon-theme');
+            } else if (newTheme === 'dark') {
+                body.classList.add('dark-theme');
+            }
+            
             currentTheme = newTheme;
             localStorage.setItem('theme', currentTheme);
             updateButtonStyles(); 
@@ -895,74 +909,111 @@ body { cursor: none; }
 
         function loadTheme() {
             const savedTheme = localStorage.getItem('theme');
-            if (savedTheme) setTheme(savedTheme);
-            else setTheme('glass');
+            if (savedTheme) {
+                setTheme(savedTheme);
+            } else {
+                setTheme('glass'); // Ustaw 'glass' jako nowy domyślny
+            }
         }
         
+        // Funkcja do aktywnego podświetlania aktualnego przycisku
         function updateButtonStyles() {
             const isGlass = currentTheme === 'glass';
             const isNeon = currentTheme === 'neon';
             const isDark = currentTheme === 'dark';
 
+            // Podświetlanie aktywnego przycisku (pełna widoczność)
             if(document.getElementById('toggle-glass')) document.getElementById('toggle-glass').style.opacity = isGlass ? 1.0 : 0.6;
             if(document.getElementById('toggle-neon')) document.getElementById('toggle-neon').style.opacity = isNeon ? 1.0 : 0.6;
             if(document.getElementById('toggle-dark')) document.getElementById('toggle-dark').style.opacity = isDark ? 1.0 : 0.6;
             
+            // Zmiana koloru licznika w zależności od motywu
             const counterSpan = document.querySelector('#visit-counter span');
             if (counterSpan) {
-                if (isDark) counterSpan.style.color = '#00FFFF';
-                else if (isNeon) counterSpan.style.color = '#FF66CC';
-                else counterSpan.style.color = '#FFFFFF';
+                if (isDark) {
+                    counterSpan.style.color = '#00FFFF'; // Futuryzm
+                } else if (isNeon) {
+                    counterSpan.style.color = '#FF66CC'; // Neon
+                } else {
+                    counterSpan.style.color = '#FFFFFF'; // Glassmorphism
+                }
             }
         }
 
-        function addNote() {
-            const noteInput = document.getElementById('note-text');
-            const noteText = noteInput.value.trim();
-            if (noteText === "") return;
-            const autor = prompt("Kto pisze? (Damian / Karolina)");
-            if (!autor) return;
-            db.collection("notatki").add({
-                text: noteText,
-                author: autor,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            })
-            .then(() => { noteInput.value = ""; })
-            .catch((error) => { console.error("Błąd zapisu: ", error); });
-        }
+        // === SKRYPT DLA NOTATEK (FIREBASE) ===
+function addNote() {
+    const noteInput = document.getElementById('note-text');
+    const noteText = noteInput.value.trim();
+    if (noteText === "") return;
 
-        function listenToNotes() {
-            db.collection("notatki").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
-                const notesList = document.getElementById('notes-list');
-                notesList.innerHTML = "";
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    let dateDisplay = "Wysyłanie...";
-                    if (data.timestamp) {
-                        const date = data.timestamp.toDate();
-                        dateDisplay = date.toLocaleDateString('pl-PL') + " " + date.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
-                    }
-                    let colorClass = "";
-                    const author = data.author ? data.author.toLowerCase() : "";
-                    if (author === "damian") colorClass = "note-damian";
-                    if (author === "karolina") colorClass = "note-karolina";
-                    notesList.innerHTML += `
-                        <div class="note-card ${colorClass}">
-                            <span class="note-metadata">${dateDisplay} // ${data.author || 'Anonim'}</span>
-                            <p>${data.text}</p>
-                            <button class="delete-note" onclick="deleteNote('${doc.id}')">×</button>
-                        </div>
-                    `;
-                });
-            });
-        }
+    // Pytanie o imię
+    const autor = prompt("Kto pisze? (Damian / Karolina)");
+    if (!autor) return; // Jeśli zamkniesz okienko bez wpisania, nic się nie doda
+
+    // Wysłanie do Firebase (tekst + autor + czas serwera)
+    db.collection("notatki").add({
+        text: noteText,
+        author: autor,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    })
+    .then(() => { noteInput.value = ""; })
+    .catch((error) => { console.error("Błąd zapisu: ", error); });
+}
+
+function listenToNotes() {
+    db.collection("notatki").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
+        const notesList = document.getElementById('notes-list');
+        notesList.innerHTML = "";
         
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            
+            // 1. Wyciąganie daty i godziny z Firebase
+            let dateDisplay = "Wysyłanie...";
+            if (data.timestamp) {
+                const date = data.timestamp.toDate();
+                dateDisplay = date.toLocaleDateString('pl-PL') + " " + date.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+            }
+
+            // 2. Sprawdzanie imienia dla koloru (Damian/Karolina)
+            let colorClass = "";
+            const author = data.author ? data.author.toLowerCase() : "";
+            if (author === "damian") colorClass = "note-damian";
+            if (author === "karolina") colorClass = "note-karolina";
+
+            // 3. Wstawianie ulepszonej notatki do strony
+            notesList.innerHTML += `
+                <div class="note-card ${colorClass}">
+                    <span class="note-metadata">${dateDisplay} // ${data.author || 'Anonim'}</span>
+                    <p>${data.text}</p>
+                    <button class="delete-note" onclick="deleteNote('${doc.id}')">×</button>
+                </div>
+            `;
+        });
+    });
+}
         function deleteNote(docId) {
             if(confirm("Na pewno usunąć tę notatkę?")) {
                 db.collection("notatki").doc(docId).delete();
             }
         }
 
+        // --- POZOSTAŁE SKRYPTY (NIEZMIENIONE) ---
+        const titleOriginal = document.title; 
+        const titleAnimated = "TO DOPIERO POCZĄTEK????????"; 
+        let isAnimatedTitle = false;
+
+        function animateTitle() {
+            if (isAnimatedTitle) {
+                document.title = titleOriginal;
+            } else {
+                document.title = titleAnimated;
+            }
+            isAnimatedTitle = !isAnimatedTitle;
+        }
+        setInterval(animateTitle, 2000);
+        
+        
         function updateClock() {
             const now = new Date();
             const timeString = now.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -973,10 +1024,20 @@ body { cursor: none; }
 
         function initVisitCounter() {
             const storageKey = 'duoVisitCount'; 
-            let count = parseInt(localStorage.getItem(storageKey) || 0) + 1;
+            let count = 0;
+            const storedCount = localStorage.getItem(storageKey);
+
+            if (storedCount) {
+                count = parseInt(storedCount, 10) + 1;
+            } else {
+                count = 1;
+            }
+
             localStorage.setItem(storageKey, count);
             const counterElement = document.getElementById('visit-counter');
-            if (counterElement) counterElement.innerHTML = `🌟 TWÓJ LICZNIK WSPOMNIEŃ: <span>${count}</span> 🌟`;
+            if (counterElement) {
+                counterElement.innerHTML = `🌟 TWÓJ LICZNIK WSPOMNIEŃ: <span>${count}</span> 🌟`;
+            }
             updateButtonStyles(); 
         }
 
@@ -984,88 +1045,121 @@ body { cursor: none; }
         function playMusic() {
             if (isPlaying) return; 
             var audioPlayer = document.getElementById('background-audio');
-            audioPlayer.play().then(() => { isPlaying = true; setVolume(document.getElementById('volume-slider').value); }).catch(console.error);
+            
+            audioPlayer.play().then(function() {
+                isPlaying = true; 
+                setVolume(document.getElementById('volume-slider').value); 
+            }).catch(function(error) {
+                console.error('Błąd odtwarzania audio:', error);
+            });
         }
         
         function setVolume(volumeValue) {
-            document.getElementById('background-audio').volume = volumeValue / 100;
+            var audioPlayer = document.getElementById('background-audio');
+            audioPlayer.volume = volumeValue / 100;
         }
         
-        window.onscroll = () => {
-            const btn = document.getElementById("back-to-top");
-            if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) btn.classList.add('show-btn');
-            else btn.classList.remove('show-btn');
-        };
+        const backToTopButton = document.getElementById("back-to-top");
+        window.onscroll = function() {scrollFunction()};
         
+        function scrollFunction() {
+            if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+                backToTopButton.classList.add('show-btn');
+            } else {
+                backToTopButton.classList.remove('show-btn');
+            }
+        }
+        
+        const snowfallContainer = document.getElementById('snowfall-container');
         function generateSnowflakes(count) {
-             const container = document.getElementById('snowfall-container');
              for (let i = 0; i < count; i++) {
-                 const s = document.createElement('div');
-                 s.classList.add('snowflake');
-                 s.style.width = s.style.height = (Math.random() * 3 + 2) + 'px';
-                 s.style.left = Math.random() * 100 + 'vw';
-                 const dur = Math.random() * 20 + 10; 
-                 s.style.animationDuration = dur + 's, ' + (dur/4) + 's';
-                 container.appendChild(s);
+                 const snowflake = document.createElement('div');
+                 snowflake.classList.add('snowflake');
+                 const size = Math.random() * 3 + 2; 
+                 snowflake.style.width = `${size}px`;
+                 snowflake.style.height = `${size}px`;
+                 snowflake.style.left = `${Math.random() * 100}vw`;
+                 const fallDuration = Math.random() * 20 + 10; 
+                 snowflake.style.animationDuration = `${fallDuration}s, ${fallDuration / 4}s`;
+                 snowflake.style.animationDelay = `-${Math.random() * fallDuration}s, -${Math.random() * fallDuration}s`;
+                 snowfallContainer.appendChild(snowflake);
              }
-        }
-
-        // --- ŚLEDZENIE ---
-        function trackVisit() {
-            let currentUser = sessionStorage.getItem('visitor_name');
-            if (!currentUser) {
-                currentUser = prompt("Kto przegląda stronę? (Damian / Karolina)");
-                if (currentUser) sessionStorage.setItem('visitor_name', currentUser);
-                else currentUser = "Anonim";
-            }
-            const userKey = currentUser.toLowerCase();
-            if (userKey === "damian" || userKey === "karolina") {
-                db.collection("stats").doc(userKey).set({ name: currentUser, lastVisit: firebase.firestore.FieldValue.serverTimestamp(), views: firebase.firestore.FieldValue.increment(1) }, { merge: true });
-                db.collection("stats").doc("global").set({ lastPerson: currentUser, lastTime: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
-            }
-        }
-
-        function listenToStats() {
-            db.collection("stats").onSnapshot((snapshot) => {
-                let counts = { damian: 0, karolina: 0 };
-                let lastPerson = "...";
-                let lastTime = "";
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    if (doc.id === "damian") counts.damian = data.views || 0;
-                    if (doc.id === "karolina") counts.karolina = data.views || 0;
-                    if (doc.id === "global") {
-                        lastPerson = data.lastPerson;
-                        if (data.lastTime) lastTime = data.lastTime.toDate().toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
-                    }
-                });
-                const el = document.getElementById('last-visitor');
-                if(el) {
-                    el.innerText = `${lastPerson} (o ${lastTime})`;
-                    el.className = "stat-value " + (lastPerson.toLowerCase() === 'damian' ? 'last-user-blue' : 'last-user-pink');
-                }
-                document.getElementById('view-counts').innerText = `D: ${counts.damian} | K: ${counts.karolina}`;
-            });
-        }
-
-        function logVisit() {
-            db.collection("historia_wizyt").add({
-                data: firebase.firestore.FieldValue.serverTimestamp(),
-                info: "Wizyta gościa"
-            }).catch(console.error);
         }
 
         window.onload = function() {
               loadTheme(); 
-              listenToNotes();
+              listenToNotes(); // Start słuchania bazy Firebase
               setVolume(document.getElementById('volume-slider').value); 
               generateSnowflakes(50); 
               updateClock();
               initVisitCounter();
-              trackVisit();
-              listenToStats();
-              logVisit();
         };
+        // --- SYSTEM ŚLEDZENIA ODWIEDZIN ---
+
+function trackVisit() {
+    // 1. Sprawdzamy czy już wiemy kto to (żeby nie pytać przy każdym odświeżeniu w tej samej sesji)
+    let currentUser = sessionStorage.getItem('visitor_name');
+
+    if (!currentUser) {
+        currentUser = prompt("Kto przegląda stronę? (Damian / Karolina)");
+        if (currentUser) {
+            sessionStorage.setItem('visitor_name', currentUser);
+        } else {
+            currentUser = "Anonim";
+        }
+    }
+
+    // 2. Aktualizacja danych w Firebase
+    const userKey = currentUser.toLowerCase();
+    if (userKey === "damian" || userKey === "karolina") {
+        const statsRef = db.collection("stats").doc(userKey);
+        
+        statsRef.set({
+            name: currentUser,
+            lastVisit: firebase.firestore.FieldValue.serverTimestamp(),
+            views: firebase.firestore.FieldValue.increment(1)
+        }, { merge: true });
+
+        // Ustawiamy globalny dokument "ostatni gość"
+        db.collection("stats").doc("global").set({
+            lastPerson: currentUser,
+            lastTime: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+    }
+}
+
+function listenToStats() {
+    // Słuchanie statystyk w czasie rzeczywistym
+    db.collection("stats").onSnapshot((snapshot) => {
+        let counts = { damian: 0, karolina: 0 };
+        let lastPerson = "...";
+        let lastTime = "";
+
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            if (doc.id === "damian") counts.damian = data.views || 0;
+            if (doc.id === "karolina") counts.karolina = data.views || 0;
+            if (doc.id === "global") {
+                lastPerson = data.lastPerson;
+                if (data.lastTime) {
+                    const dt = data.lastTime.toDate();
+                    lastTime = dt.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+                }
+            }
+        });
+
+        // Wyświetlanie w HTML
+        const visitorElement = document.getElementById('last-visitor');
+        visitorElement.innerText = `${lastPerson} (o ${lastTime})`;
+        visitorElement.className = "stat-value " + (lastPerson.toLowerCase() === 'damian' ? 'last-user-blue' : 'last-user-pink');
+        
+        document.getElementById('view-counts').innerText = `D: ${counts.damian} | K: ${counts.karolina}`;
+    });
+}
+
+// Odpalenie funkcji (dodaj to do swojego window.onload)
+trackVisit();
+listenToStats();
     </script>
 </body>
 </html>
