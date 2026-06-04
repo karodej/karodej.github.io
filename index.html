@@ -850,6 +850,14 @@ document.addEventListener('mousemove', (e) => {
     cursor.style.left = e.clientX + 'px';
     cursor.style.top = e.clientY + 'px';
 });
+		function logVisit() {
+    // Zapisujemy nową wizytę jako dokument z automatycznym ID
+    db.collection("historia_wizyt").add({
+        data: firebase.firestore.FieldValue.serverTimestamp(),
+        info: "Wizyta gościa"
+    })
+    .catch((error) => console.error("Błąd zapisu: ", error));
+}
 
 // Efekt powiększenia przy najechaniu na przyciski
 document.querySelectorAll('button, a, .note-card').forEach(item => {
@@ -1086,13 +1094,21 @@ function listenToNotes() {
              }
         }
 
-        window.onload = function() {
-              loadTheme(); 
-              listenToNotes(); // Start słuchania bazy Firebase
-              setVolume(document.getElementById('volume-slider').value); 
-              generateSnowflakes(50); 
-              updateClock();
-              initVisitCounter();
+window.onload = function() {
+    loadTheme(); 
+    listenToNotes(); // Start słuchania bazy Firebase
+    setVolume(document.getElementById('volume-slider').value); 
+    generateSnowflakes(50); 
+    updateClock();
+    initVisitCounter();
+    
+    // --- Twoje funkcje śledzenia ---
+    trackVisit();      // To śledzi, czy był Damian czy Karolina
+    listenToStats();   // To aktualizuje licznik z imieniem
+    
+    // --- Dodane "automatyczne spisywanie" każdej wizyty ---
+    logVisit();        // To zapisuje każdą wizytę w "historia_wizyt"
+};
         };
         // --- SYSTEM ŚLEDZENIA ODWIEDZIN ---
 
