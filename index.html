@@ -618,6 +618,18 @@ body { cursor: none; }
     animation: heart-beat 1.5s infinite ease-in-out;
 }
 
+/* Nowa zaawansowana animacja dla ulepszonego neonu "MISS YOU" */
+@keyframes mega-neon-glow {
+    0%, 100% {
+        text-shadow: 0 0 7px #fff, 0 0 15px #bb86fc, 0 0 30px #bb86fc, 0 0 60px #ff0077;
+        transform: scale(1);
+    }
+    50% {
+        text-shadow: 0 0 12px #fff, 0 0 25px #ff0077, 0 0 50px #ff0077, 0 0 80px #bb86fc;
+        transform: scale(1.04);
+    }
+}
+
 /* Animacje pulsowania */
 @keyframes flicker-blue {
     0%, 100% { opacity: 1; text-shadow: 0 0 10px #00d2ff, 0 0 20px #00d2ff; }
@@ -687,7 +699,16 @@ body { cursor: none; }
         </div>
         <p id="neon-clock" class="neon-text"></p>
         
-        <p class="neon-text" style="font-size: 1.6em; letter-spacing: 3px; margin: 15px 0; font-weight: 600; animation: heart-beat 2s infinite ease-in-out;">
+        <p style="
+            color: #FFFFFF;
+            font-size: 1.8em; 
+            letter-spacing: 5px; 
+            margin: 20px 0; 
+            font-weight: 900; 
+            display: inline-block;
+            transition: all 0.3s ease;
+            animation: mega-neon-glow 2.5s infinite ease-in-out;
+        ">
             MISS YOU 💜
         </p>
         
@@ -771,7 +792,7 @@ body { cursor: none; }
                 <div class="gallery-item"><img src="zdjecie_25.jpg" alt="Wspomnienie 25"></div>
                 <div class="gallery-item"><img src="zdjecie_26.jpg" alt="Wspomnienie 26"></div>
                 <div class="gallery-item"><img src="zdjecie_27.jpg" alt="Wspomnienie 27"></div>
- <div class="gallery-item"><img src="zdjecie_28.jpg" alt="Wspomnienie 28"></div>
+
             </div>
         </section>
 
