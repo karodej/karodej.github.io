@@ -896,21 +896,25 @@ body { cursor: none; }
         // Inicjalizacja Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-
-        // LICZNIK DUO
-        function updateDuoCounter() {
-            const startDate = new Date('2025-08-31T00:00:00');
-            const now = new Date();
-            const diff = now - startDate;
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-            document.getElementById('love-clock').innerHTML = 
-                `JESTEŚMY RAZEM JUŻ:<br><span style="font-size: 1.4em;">${days} dni, ${hours}h ${minutes}m ${seconds}s</span> ❤️`;
-        }
-        setInterval(updateDuoCounter, 1000);
-
+// ZAMKNIĘTY LICZNIK DUO Z PODSUMOWANIEM
+function setStaticDuoCounter() {
+    const startDate = new Date('2025-08-31T00:00:00');
+    // Ustaw dokładną datę i godzinę zakończenia: RRRR-MM-DDTHH:MM:SS
+    const endDate = new Date('2026-08-13T22:00:00'); 
+    
+    const diff = endDate - startDate;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    
+    document.getElementById('love-clock').innerHTML = 
+        `BYLIŚMY RAZEM PRZEZ:<br>` +
+        `<span style="font-size: 1.4em;">${days} dni, ${hours}h ${minutes}m ${seconds}s</span> 💜<br>` +
+        `<span style="font-size: 0.85em; opacity: 0.8; margin-top: 8px; display: inline-block;">....licznik ruszy gdy nasze drogi znów się zejdą..</span>`;
+}
+// Wywołujemy funkcję tylko raz przy załadowaniu (bez setInterval)
+setStaticDuoCounter();
         // Ustawiamy domyślny motyw na 'glass'
         let currentTheme = 'glass'; 
 
