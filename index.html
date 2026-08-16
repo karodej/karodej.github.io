@@ -1084,7 +1084,30 @@ setStaticDuoCounter();
                  snowfallContainer.appendChild(snowflake);
              }
         }
+// SYSTEM ŚLEDZENIA KLIKNIĘĆ
+document.addEventListener('click', function(event) {
+    // Pobieramy imię osoby zapisane w sesji (Damian / Karolina / Anonim)
+    const currentUser = sessionStorage.getItem('visitor_name') || 'Anonim';
+    
+    // Rozpoznajemy, w co kliknięto (przycisk, obrazek, link lub inny element)
+    const target = event.target;
+    let clickedElement = target.tagName;
+    
+    if (target.alt) {
+        clickedElement += ` ("${target.alt}")`; // Np. zdjęcie z opisem
+    } else if (target.innerText && target.innerText.length < 30) {
+        clickedElement += ` ("${target.innerText.trim()}")`; // Np. tekst przycisku
+    } else if (target.id) {
+        clickedElement += ` (#${target.id})`; // ID elementu
+    }
 
+    // Zapisujemy kliknięcie do nowej kolekcji "klikniecia" w Firebase
+    db.collection("klikniecia").add({
+        uzytkownik: currentUser,
+        element: clickedElement,
+        data: firebase.firestore.FieldValue.serverTimestamp()
+    }).catch(console.error);
+});
         // --- SYSTEM ŚLEDZENIA ODWIEDZIN ---
         function trackVisit() {
             let currentUser = sessionStorage.getItem('visitor_name');
