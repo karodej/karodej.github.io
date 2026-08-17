@@ -754,18 +754,20 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
 </div>
 
-<!-- SEKCJA 4: PYTANIA I ODPOWIEDZI (FORUM) -->
+<!-- SEKCJA: WĄTKOWANE PYTANIA I ODPOWIEDZI -->
 <div class="glass-card" style="margin-top: 20px; text-align: center;">
     <h3 style="margin-bottom: 12px; letter-spacing: 1px; font-size: 1.1em;">💬 MASZ JAKIEŚ PYTANIE?</h3>
     
-    <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 15px; flex-wrap: wrap;">
-        <input type="text" id="qa-input" placeholder="Zadaj pytanie lub odpowiedz..." 
+    <!-- Formularz dodawania nowego pytania -->
+    <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap;">
+        <input type="text" id="qa-main-input" placeholder="Zadaj nowe pytanie..." 
                style="padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: #fff; width: 70%; max-width: 300px; font-size: 0.85em;">
-        <button class="theme-toggle-button" onclick="sendQAMessage()" style="padding: 8px 15px;">Wyślij</button>
+        <button class="theme-toggle-button" onclick="sendQuestion()" style="padding: 8px 15px;">Zadaj pytanie</button>
     </div>
 
-    <div id="qa-history" style="text-align: left; max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 5px;">
-        <p style="text-align: center; opacity: 0.5; font-size: 0.85em;">Wczytywanie wpisów...</p>
+    <!-- Kontener na wątki pytań i odpowiedzi -->
+    <div id="qa-threads-container" style="text-align: left; max-height: 350px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; padding-right: 5px;">
+        <p style="text-align: center; opacity: 0.5; font-size: 0.85em;">Wczytywanie pytań...</p>
     </div>
 </div>
         <p id="visit-counter" class="neon-text" style="font-size: 1.2em; margin-top: 10px;"></p>
@@ -1359,31 +1361,81 @@ function listenDrawings() {
 }
 
 // ==========================================
-// SEKCJA 4: PYTANIA I ODPOWIEDZI (FORUM)
+// SEKCJA: PRAWDZIWE FORUM (WĄTKI PYTAŃ I ODPOWIEDZI)
 // ==========================================
-function sendQAMessage() {
-    const input = document.getElementById('qa-input');
+
+// Zadawanie głównego pytania
+function sendQuestion() {
+    const input = document.getElementById('qa-main-input');
     const text = input.value.trim();
     const user = sessionStorage.getItem('visitor_name') || 'Anonim';
 
     if (!text) return;
 
-    db.collection("qa_forum").add({
-        text: text,
+    db.collection("qa_threads").add({
+        question: text,
         author: user,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        replies: [] // Tablica na odpowiedzi
     }).then(() => {
         input.value = '';
     }).catch(console.error);
 }
 
-function listenQA() {
-    db.collection("qa_forum").orderBy("createdAt", "desc").onSnapshot(snapshot => {
-        const container = document.getElementById('qa-history');
+// Dodawanie odpowiedzi do konkretnego pytania
+function sendReply(threadId) {
+    const input = document.getElementById(`reply-input-${threadId}`);
+    const text = input.value.trim();
+    const user = sessionStorage.getItem('visitor_name') || 'Anonim';
+
+    if (!text) return;
+
+    const replyObject = {
+        id: Date.now().toString(), // Unikalny identyfikator odpowiedzi
+        author: user,
+        text: text,
+        createdAt: new Date().toISOString()
+    };
+
+    db.collection("qa_threads").doc(threadId).update({
+        replies: firebase.firestore.FieldValue.arrayUnion(replyObject)
+    }).then(() => {
+        input.value = '';
+    }).catch(console.error);
+}
+
+// Usuwanie całego pytania wraz z odpowiedziami
+function deleteQuestion(threadId) {
+    if (confirm("Czy na pewno chcesz usunąć to pytanie wraz z odpowiedziami?")) {
+        db.collection("qa_threads").doc(threadId).delete().catch(console.error);
+    }
+}
+
+// Usuwanie pojedynczej odpowiedzi
+function deleteReply(threadId, replyObj) {
+    if (confirm("Czy na pewno chcesz usunąć tę odpowiedź?")) {
+        db.collection("qa_threads").doc(threadId).update({
+            replies: firebase.firestore.FieldValue.arrayRemove(replyObj)
+        }).catch(console.error);
+    }
+}
+
+// Pokaż/Ukryj formularz odpowiadania
+function toggleReplyForm(threadId) {
+    const form = document.getElementById(`reply-form-${threadId}`);
+    if (form) {
+        form.style.display = form.style.display === 'none' ? 'flex' : 'none';
+    }
+}
+
+// Nasłuchiwanie wątków w czasie rzeczywistym
+function listenQAThreads() {
+    db.collection("qa_threads").orderBy("createdAt", "desc").onSnapshot(snapshot => {
+        const container = document.getElementById('qa-threads-container');
         if (!container) return;
 
         if (snapshot.empty) {
-            container.innerHTML = `<p style="text-align: center; opacity: 0.5; font-size: 0.85em;">Brak pytań i odpowiedzi....</p>`;
+            container.innerHTML = `<p style="text-align: center; opacity: 0.5; font-size: 0.85em;">Brak pytań. Zrób pierwszy krok i zadaj pytanie powyżej!</p>`;
             return;
         }
 
@@ -1391,27 +1443,75 @@ function listenQA() {
 
         snapshot.forEach(doc => {
             const data = doc.data();
-            const date = data.createdAt ? data.createdAt.toDate() : new Date();
-            const timeStr = date.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' }) + ' o ' + 
-                            date.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+            const threadId = doc.id;
+            
+            // Formatowanie daty pytania
+            const qDate = data.createdAt ? data.createdAt.toDate() : new Date();
+            const qTimeStr = qDate.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' }) + ' o ' + 
+                             qDate.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
 
-            const msgCard = document.createElement('div');
-            msgCard.style.cssText = "background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; font-size: 0.88em;";
-            msgCard.innerHTML = `
-                <div style="display: flex; justify-content: space-between; margin-bottom: 4px; opacity: 0.75; font-size: 0.85em;">
-                    <strong>${data.author}</strong>
-                    <span>${timeStr}</span>
+            const threadCard = document.createElement('div');
+            threadCard.style.cssText = "background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.12); padding: 12px; border-radius: 10px; font-size: 0.88em;";
+
+            // Nagłówek pytania + treść
+            let html = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; opacity: 0.75; font-size: 0.82em;">
+                    <span><strong>❓ ${data.author}</strong> (${qTimeStr})</span>
+                    <button onclick="deleteQuestion('${threadId}')" style="background: transparent; border: none; color: #ff8888; cursor: pointer; font-size: 0.8em;">✕ usuń pytanie</button>
                 </div>
-                <div style="word-break: break-word;">${data.text}</div>
+                <div style="font-weight: 600; font-size: 1em; margin-bottom: 10px; word-break: break-word; color: #fff;">
+                    ${data.question}
+                </div>
             `;
-            container.appendChild(msgCard);
+
+            // Lista odpowiedzi pod pytaniem (wcięcie z lewej strony)
+            html += `<div style="margin-left: 12px; border-left: 2px solid rgba(255,255,255,0.15); padding-left: 10px; display: flex; flex-direction: column; gap: 8px;">`;
+            
+            if (data.replies && data.replies.length > 0) {
+                data.replies.forEach(r => {
+                    const rDate = new Date(r.createdAt);
+                    const rTimeStr = rDate.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' }) + ' o ' + 
+                                     rDate.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+
+                    // Przygotowanie obiektu do usunięcia
+                    const replyJson = JSON.stringify(r).replace(/"/g, '&quot;');
+
+                    html += `
+                        <div style="background: rgba(255,255,255,0.05); padding: 6px 8px; border-radius: 6px; font-size: 0.9em;">
+                            <div style="display: flex; justify-content: space-between; opacity: 0.7; font-size: 0.8em; margin-bottom: 2px;">
+                                <span>💬 <strong>${r.author}</strong> (${rTimeStr})</span>
+                                <button onclick="deleteReply('${threadId}', ${replyJson})" style="background: transparent; border: none; color: #ff8888; cursor: pointer; font-size: 0.75em;">✕</button>
+                            </div>
+                            <div style="word-break: break-word;">${r.text}</div>
+                        </div>
+                    `;
+                });
+            }
+
+            html += `</div>`; // Koniec listy odpowiedzi
+
+            // Przycisk "Odpowiedz" + Zwijany formularz odpowiedzi
+            html += `
+                <div style="margin-top: 10px; text-align: right;">
+                    <button onclick="toggleReplyForm('${threadId}')" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 0.8em; cursor: pointer;">
+                        ↩ Odpowiedz
+                    </button>
+                </div>
+                <div id="reply-form-${threadId}" style="display: none; gap: 6px; margin-top: 8px; justify-content: flex-end;">
+                    <input type="text" id="reply-input-${threadId}" placeholder="Napisz odpowiedź..." 
+                           style="padding: 6px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.4); color: #fff; font-size: 0.82em; width: 70%;">
+                    <button onclick="sendReply('${threadId}')" class="theme-toggle-button" style="padding: 6px 12px; font-size: 0.8em;">Wyślij</button>
+                </div>
+            `;
+
+            threadCard.innerHTML = html;
+            container.appendChild(threadCard);
         });
     });
 }
 
-// Uruchomienie nasłuchiwania po załadowaniu
-listenDrawings();
-listenQA();
+// Uruchomienie nasłuchiwania wątków
+listenQAThreads();
     </script>
 </body>
 </html>
