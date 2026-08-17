@@ -659,6 +659,29 @@ body { cursor: none; }
     border-radius: 10px;
     box-shadow: 0 0 10px #bb86fc; /* Efekt świecenia */
 }
+// LIGHTBOX - PEŁNY EKRAN DLA ZDJĘĆ
+document.addEventListener('DOMContentLoaded', () => {
+    // Tworzymy kontener dla powiększonego zdjęcia
+    const lightbox = document.createElement('div');
+    lightbox.id = 'lightbox';
+    document.body.appendChild(lightbox);
+
+    const img = document.createElement('img');
+    lightbox.appendChild(img);
+
+    // Otwieranie zdjęcia po kliknięciu
+    document.querySelectorAll('.gallery-item img').forEach(image => {
+        image.addEventListener('click', () => {
+            lightbox.classList.add('active');
+            img.src = image.src;
+        });
+    });
+
+    // Zamykanie po kliknięciu gdziekolwiek w tło
+    lightbox.addEventListener('click', () => {
+        lightbox.classList.remove('active');
+    });
+});
     </style>
 </head>
 <body> 
@@ -711,7 +734,59 @@ body { cursor: none; }
         ">
             MISS YOU 💜
         </p>
-        
+        <!-- ODTWARZACZ NASTROJU / ZMIANA UTWORU -->
+<div class="glass-card" style="margin-top: 20px; text-align: center;">
+    <h3 style="margin-bottom: 12px; letter-spacing: 1px; font-size: 1.1em;">🎵 PIOSENKA NA DZIS???</h3>
+    
+    <!-- Kontener na odtwarzacz YouTube / Spotify -->
+    <div id="music-player-container" style="margin-bottom: 15px;">
+        <p style="opacity: 0.6; font-size: 0.9em;">Wczytywanie utworu...</p>
+    </div>
+
+    <!-- Informacja o tym, kto i kiedy zmienił utwór -->
+    <p id="music-updated-info" style="font-size: 0.8em; opacity: 0.75; margin-bottom: 15px; font-style: italic;"></p>
+
+    <!-- Formularz zmiany linku -->
+    <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+        <input type="text" id="song-url-input" placeholder="Wklej link z YouTube lub Spotify..." 
+               style="padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: #fff; width: 70%; max-width: 300px; font-size: 0.85em;">
+        <button class="theme-toggle-button" onclick="changeSharedSong()" style="padding: 8px 15px;">Zmień</button>
+    </div>
+</div>
+
+<!-- SEKCJA 3: WSPÓLNA TABLICA / RYSOWNIK -->
+<div class="glass-card" style="margin-top: 20px; text-align: center;">
+    <h3 style="margin-bottom: 12px; letter-spacing: 1px; font-size: 1.1em;">TABLICA RYSUNKOWA</h3>
+    
+    <div style="position: relative; inline-block; width: 100%; max-width: 320px; margin: 0 auto;">
+        <canvas id="draw-canvas" width="300" height="200" style="border: 1px solid rgba(255,255,255,0.3); background: #1a1a1a; border-radius: 12px; cursor: crosshair; touch-action: none;"></canvas>
+    </div>
+
+    <div style="margin-top: 10px; display: flex; gap: 8px; justify-content: center; align-items: center; flex-wrap: wrap;">
+        <input type="color" id="draw-color" value="#ffffff" style="border: none; background: transparent; width: 32px; height: 32px; cursor: pointer;">
+        <button class="theme-toggle-button" onclick="clearCanvas()" style="padding: 6px 12px; font-size: 0.8em;">Wyczyść rysunek</button>
+        <button class="theme-toggle-button" onclick="saveDrawing()" style="padding: 6px 14px; font-size: 0.8em; background: rgba(255,255,255,0.2);">Wyślij rysunek </button>
+    </div>
+
+    <div id="draw-history" style="margin-top: 15px; font-size: 0.8em; opacity: 0.8; text-align: left; max-height: 120px; overflow-y: auto; padding-right: 5px;">
+        <p style="text-align: center; opacity: 0.5;">Wczytywanie historii rysunków...</p>
+    </div>
+</div>
+
+<!-- SEKCJA 4: PYTANIA I ODPOWIEDZI (FORUM) -->
+<div class="glass-card" style="margin-top: 20px; text-align: center;">
+    <h3 style="margin-bottom: 12px; letter-spacing: 1px; font-size: 1.1em;">💬 MASZ JAKIEŚ PYTANIE?</h3>
+    
+    <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 15px; flex-wrap: wrap;">
+        <input type="text" id="qa-input" placeholder="Zadaj pytanie lub odpowiedz..." 
+               style="padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: #fff; width: 70%; max-width: 300px; font-size: 0.85em;">
+        <button class="theme-toggle-button" onclick="sendQAMessage()" style="padding: 8px 15px;">Wyślij</button>
+    </div>
+
+    <div id="qa-history" style="text-align: left; max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 5px;">
+        <p style="text-align: center; opacity: 0.5; font-size: 0.85em;">Wczytywanie wpisów...</p>
+    </div>
+</div>
         <p id="visit-counter" class="neon-text" style="font-size: 1.2em; margin-top: 10px;"></p>
         <p class="neon-alert">
             Wiesz co z tym zrobić😎 👇
@@ -1084,30 +1159,7 @@ setStaticDuoCounter();
                  snowfallContainer.appendChild(snowflake);
              }
         }
-// SYSTEM ŚLEDZENIA KLIKNIĘĆ
-document.addEventListener('click', function(event) {
-    // Pobieramy imię osoby zapisane w sesji (Damian / Karolina / Anonim)
-    const currentUser = sessionStorage.getItem('visitor_name') || 'Anonim';
-    
-    // Rozpoznajemy, w co kliknięto (przycisk, obrazek, link lub inny element)
-    const target = event.target;
-    let clickedElement = target.tagName;
-    
-    if (target.alt) {
-        clickedElement += ` ("${target.alt}")`; // Np. zdjęcie z opisem
-    } else if (target.innerText && target.innerText.length < 30) {
-        clickedElement += ` ("${target.innerText.trim()}")`; // Np. tekst przycisku
-    } else if (target.id) {
-        clickedElement += ` (#${target.id})`; // ID elementu
-    }
 
-    // Zapisujemy kliknięcie do nowej kolekcji "klikniecia" w Firebase
-    db.collection("klikniecia").add({
-        uzytkownik: currentUser,
-        element: clickedElement,
-        data: firebase.firestore.FieldValue.serverTimestamp()
-    }).catch(console.error);
-});
         // --- SYSTEM ŚLEDZENIA ODWIEDZIN ---
         function trackVisit() {
             let currentUser = sessionStorage.getItem('visitor_name');
@@ -1188,6 +1240,285 @@ document.addEventListener('click', function(event) {
             listenToStats();
             logVisit();
         };
+// LIGHTBOX - PEŁNY EKRAN DLA ZDJĘĆ
+document.addEventListener('DOMContentLoaded', () => {
+    // Tworzymy kontener dla powiększonego zdjęcia
+    const lightbox = document.createElement('div');
+    lightbox.id = 'lightbox';
+    document.body.appendChild(lightbox);
+
+    const img = document.createElement('img');
+    lightbox.appendChild(img);
+
+    // Otwieranie zdjęcia po kliknięciu
+    document.querySelectorAll('.gallery-item img').forEach(image => {
+        image.addEventListener('click', () => {
+            lightbox.classList.add('active');
+            img.src = image.src;
+        });
+    });
+
+    // Zamykanie po kliknięciu gdziekolwiek w tło
+    lightbox.addEventListener('click', () => {
+        lightbox.classList.remove('active');
+    });
+});
+// ODSŁUCH I ZMIANA WSPÓLNEJ PIOSENKI (YOUTUBE / SPOTIFY)
+function listenSharedSong() {
+    db.collection("settings").doc("current_song")
+        .onSnapshot((doc) => {
+            if (doc.exists) {
+                const data = doc.data();
+                renderMusicPlayer(data.url);
+                
+                // Formakowanie daty i godziny
+                if (data.updatedAt) {
+                    const date = data.updatedAt.toDate();
+                    const formattedDate = date.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                    const formattedTime = date.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+                    
+                    document.getElementById('music-updated-info').innerText = 
+                        `Ostatnio zmienił(a): ${data.updatedBy} (${formattedDate} o ${formattedTime})`;
+                }
+            } else {
+                document.getElementById('music-player-container').innerHTML = 
+                    `<p style="opacity:0.6; font-size:0.85em;">Brak utworu, link poniżej</p>`;
+            }
+        }, (error) => {
+            console.error("Błąd pobierania utworu:", error);
+        });
+}
+
+// Funkcja generująca odpowiedni iframe (YT lub Spotify)
+function renderMusicPlayer(url) {
+    const container = document.getElementById('music-player-container');
+    
+    // YouTube
+    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+        let videoId = '';
+        if (url.includes('youtu.be/')) {
+            videoId = url.split('youtu.be/')[1].split('?')[0];
+        } else if (url.includes('v=')) {
+            videoId = url.split('v=')[1].split('&')[0];
+        }
+        
+        if (videoId) {
+            container.innerHTML = `
+                <iframe width="100%" height="200" src="https://www.youtube.com/embed/${videoId}" 
+                        title="YouTube video player" frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen style="border-radius: 12px;"></iframe>`;
+            return;
+        }
+    } 
+    
+    // Spotify
+    if (url.includes('spotify.com')) {
+        let embedUrl = url;
+        if (!url.includes('/embed/')) {
+            embedUrl = url.replace('spotify.com/', 'spotify.com/embed/');
+        }
+        container.innerHTML = `
+            <iframe style="border-radius:12px" src="${embedUrl}" 
+                    width="100%" height="152" frameBorder="0" allowfullscreen="" 
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
+        return;
+    }
+
+    container.innerHTML = `<p style="color: #ff8888; font-size: 0.85em;">Nieobsługiwany link. Wklej poprawny link z YouTube lub Spotify.</p>`;
+}
+
+// Funkcja zapisu nowej piosenki do Firebase
+function changeSharedSong() {
+    const input = document.getElementById('song-url-input');
+    const newUrl = input.value.trim();
+    const currentUser = sessionStorage.getItem('visitor_name') || 'Anonim';
+
+    if (!newUrl) {
+        alert("Wklej najpierw link do piosenki!");
+        return;
+    }
+
+    db.collection("settings").doc("current_song").set({
+        url: newUrl,
+        updatedBy: currentUser,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+        input.value = ''; // Czyszczenie pola
+    }).catch((error) => {
+        console.error("Błąd zapisu piosenki:", error);
+    });
+}
+
+// Uruchamiamy nasłuchiwanie od razu po załadowaniu
+listenSharedSong();
+// ==========================================
+// SEKCJA 3: RYSOWNIK (CANVAS + FIREBASE)
+// ==========================================
+const canvas = document.getElementById('draw-canvas');
+const ctx = canvas ? canvas.getContext('2d') : null;
+let isDrawing = false;
+
+if (canvas && ctx) {
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return {
+            x: clientX - rect.left,
+            y: clientY - rect.top
+        };
+    }
+
+    function startDraw(e) {
+        isDrawing = true;
+        const pos = getPos(e);
+        ctx.strokeStyle = document.getElementById('draw-color').value;
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
+    }
+
+    function draw(e) {
+        if (!isDrawing) return;
+        const pos = getPos(e);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+    }
+
+    function stopDraw() {
+        isDrawing = false;
+    }
+
+    // Myszka
+    canvas.addEventListener('mousedown', startDraw);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDraw);
+    canvas.addEventListener('mouseleave', stopDraw);
+
+    // Dotyk (Telefony)
+    canvas.addEventListener('touchstart', startDraw);
+    canvas.addEventListener('touchmove', draw);
+    canvas.addEventListener('touchend', stopDraw);
+}
+
+function clearCanvas() {
+    if (ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+}
+
+function saveDrawing() {
+    if (!canvas) return;
+    const dataUrl = canvas.toDataURL();
+    const user = sessionStorage.getItem('visitor_name') || 'Anonim';
+
+    db.collection("drawings").add({
+        image: dataUrl,
+        author: user,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+        console.log("Rysunek zapisany!");
+    }).catch(console.error);
+}
+
+// Nasłuchiwanie nowych rysunków i historii
+function listenDrawings() {
+    db.collection("drawings").orderBy("createdAt", "desc").onSnapshot(snapshot => {
+        const historyContainer = document.getElementById('draw-history');
+        if (!historyContainer) return;
+
+        if (snapshot.empty) {
+            historyContainer.innerHTML = `<p style="text-align: center; opacity: 0.5;">Brak opublikowanych rysunków.</p>`;
+            return;
+        }
+
+        historyContainer.innerHTML = '';
+        let isFirst = true;
+
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            const date = data.createdAt ? data.createdAt.toDate() : new Date();
+            const timeStr = date.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' }) + ' ' + 
+                            date.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+
+            // Jeśli to najnowszy rysunek, załaduj go na canvas
+            if (isFirst && ctx) {
+                const img = new Image();
+                img.onload = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0);
+                };
+                img.src = data.image;
+                isFirst = false;
+            }
+
+            // Dodaj wpis do historii pod canvasem
+            const item = document.createElement('div');
+            item.style.cssText = "border-bottom: 1px solid rgba(255,255,255,0.1); padding: 4px 0;";
+            item.innerHTML = `<strong>${data.author}</strong> <span style="opacity:0.6; font-size:0.85em;">(${timeStr})</span> wysłał(a) nowy rysunek.`;
+            historyContainer.appendChild(item);
+        });
+    });
+}
+
+// ==========================================
+// SEKCJA 4: PYTANIA I ODPOWIEDZI (FORUM)
+// ==========================================
+function sendQAMessage() {
+    const input = document.getElementById('qa-input');
+    const text = input.value.trim();
+    const user = sessionStorage.getItem('visitor_name') || 'Anonim';
+
+    if (!text) return;
+
+    db.collection("qa_forum").add({
+        text: text,
+        author: user,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+        input.value = '';
+    }).catch(console.error);
+}
+
+function listenQA() {
+    db.collection("qa_forum").orderBy("createdAt", "desc").onSnapshot(snapshot => {
+        const container = document.getElementById('qa-history');
+        if (!container) return;
+
+        if (snapshot.empty) {
+            container.innerHTML = `<p style="text-align: center; opacity: 0.5; font-size: 0.85em;">Brak pytań i odpowiedzi....</p>`;
+            return;
+        }
+
+        container.innerHTML = '';
+
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            const date = data.createdAt ? data.createdAt.toDate() : new Date();
+            const timeStr = date.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' }) + ' o ' + 
+                            date.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+
+            const msgCard = document.createElement('div');
+            msgCard.style.cssText = "background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; font-size: 0.88em;";
+            msgCard.innerHTML = `
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px; opacity: 0.75; font-size: 0.85em;">
+                    <strong>${data.author}</strong>
+                    <span>${timeStr}</span>
+                </div>
+                <div style="word-break: break-word;">${data.text}</div>
+            `;
+            container.appendChild(msgCard);
+        });
+    });
+}
+
+// Uruchomienie nasłuchiwania po załadowaniu
+listenDrawings();
+listenQA();
     </script>
 </body>
 </html>
