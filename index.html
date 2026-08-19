@@ -1222,6 +1222,7 @@ setStaticDuoCounter();
             trackVisit();
             listenToStats();
             logVisit();
+			trackAnonymousUser();
         };
 // LIGHTBOX - PEŁNY EKRAN DLA ZDJĘĆ
 document.addEventListener('DOMContentLoaded', () => {
@@ -1513,6 +1514,52 @@ function listenQAThreads() {
 // Uruchomienie nasłuchiwania wątków
 listenDrawings();
 listenQAThreads();
+		async function trackAnonymousUser() {
+    let visitorId = localStorage.getItem('visitor_id');
+    if (!visitorId) {
+        visitorId = 'Anonim-' + Math.random().toString(36).substring(2, 9);
+        localStorage.setItem('visitor_id', visitorId);
+    }
+
+    try {
+        const response = await fetch('https://api.ipify.org?format=json');
+        const data = await response.json();
+        const userIP = data.ip;
+
+        const userAgent = navigator.userAgent;
+        let deviceType = "PC";
+        if (/Android/i.test(userAgent)) deviceType = "Android";
+        else if (/iPhone|iPad/i.test(userAgent)) deviceType = "iOS";
+
+        const payload = {
+            username: "Logi Odwiedzin",
+            embeds: [{
+                title: "👤 Nowe wejście na stronę",
+                color: 3447003,
+                fields: [
+                    { name: "ID Użytkownika", value: visitorId, inline: true },
+                    { name: "Adres IP", value: userIP, inline: true },
+                    { name: "Urządzenie", value: deviceType, inline: true },
+                    { name: "Data", value: new Date().toLocaleString('pl-PL'), inline: false }
+                ]
+            }]
+        };
+
+        const webhookUrl = 'https://discord.com/api/webhooks/1539641429960429601/pd2H-8541F2IqT5AKR8aMdkrIzHaX7DMEi6xLCjAQa8TndMPfSL2FVEizywufdXECDWe';
+        
+        if (!sessionStorage.getItem('logged_this_session')) {
+            await fetch(webhookUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            sessionStorage.setItem('logged_this_session', 'true');
+        }
+
+    } catch (error) {
+        console.error("Błąd śledzenia:", error);
+    }
+}
     </script>
 </body>
 </html>
