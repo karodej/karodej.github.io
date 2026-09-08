@@ -1778,6 +1778,35 @@
   <div class="app-wrapper">
 
     <header>
+<div id="love-clock">Ładowanie...</div>
+
+<div style="margin: 8px 0; font-size: 0.85rem;">
+  <label for="user-name-select">Jestem: </label>
+  <select id="user-name-select" onchange="saveUserName()" style="padding: 2px 6px; border-radius: 4px; background: inherit; color: inherit;">
+    <option value="Damian">Damian</option>
+    <option value="Karolina">Karolina</option>
+  </select>
+</div>
+
+<div style="margin: 10px 0;">
+  <button id="timer-toggle-btn" class="theme-toggle-button" onclick="toggleTimer()" style="padding: 6px 20px; font-size: 0.8rem;">
+    Ładowanie...
+  </button>
+</div>
+
+<div id="timer-info" style="font-size: 0.8rem; opacity: 0.85; margin-bottom: 8px;"></div>
+
+<div id="timer-history-box" style="font-size: 0.75rem; max-height: 110px; overflow-y: auto; text-align: left; margin: 5px auto; width: 85%; background: rgba(0,0,0,0.1); padding: 5px 10px; border-radius: 6px;">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <span style="font-weight: bold;">Ostatnie akcje:</span>
+    <button onclick="clearHistory()" style="background: none; border: none; color: #ff5555; cursor: pointer; font-size: 0.7rem; text-decoration: underline;">
+      Wyszczyść logi
+    </button>
+  </div>
+  <ul id="timer-history-list" style="margin: 3px 0; padding-left: 15px;"></ul>
+</div>
+
+<p id="neon-clock"></p>
       <div class="logo-wrapper">
         <div class="neon-logo">
           <span class="logo-letter letter-d">D</span>
@@ -1995,6 +2024,180 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+// ============================================================
+// LOGIKA LICZNIKA Z FIRESTORE (KONTYNUKACJA CZASU)
+// ============================================================
+const timerDocRef = db.collection('timer').doc('state');
+const historyColRef = db.collection('timerHistory');
+
+// Domyślny czas początkowy: 347 dni + 22h w ms (30060000000 ms)
+const INITIAL_ACCUMULATED_MS = (347 * 24 * 60 * 60 * 1000) + (22 * 60 * 60 * 1000);
+
+let currentTimerState = { 
+  isRunning: false, 
+  startTimestamp: null, 
+  accumulatedMs: INITIAL_ACCUMULATED_MS, 
+  lastBy: '' 
+};
+let timerInterval = null;
+
+window.saveUserName = function() {
+  const select = document.getElementById('user-name-select');
+  if (select) {
+    localStorage.setItem('timer_user_name', select.value);
+  }
+};
+
+function initUserName() {
+  const savedName = localStorage.getItem('timer_user_name');
+  const select = document.getElementById('user-name-select');
+  if (savedName && select) {
+    select.value = savedName;
+  }
+}
+
+// Nasłuchiwanie stanu z Firestore
+timerDocRef.onSnapshot((doc) => {
+  if (doc.exists) {
+    const data = doc.data();
+    currentTimerState = {
+      isRunning: data.isRunning || false,
+      startTimestamp: data.startTimestamp || null,
+      accumulatedMs: data.accumulatedMs !== undefined ? data.accumulatedMs : INITIAL_ACCUMULATED_MS,
+      lastBy: data.lastBy || ''
+    };
+  } else {
+    currentTimerState = { 
+      isRunning: false, 
+      startTimestamp: null, 
+      accumulatedMs: INITIAL_ACCUMULATED_MS, 
+      lastBy: '' 
+    };
+  }
+  updateUI();
+});
+
+// Nasłuchiwanie historii (ostatnie 5)
+historyColRef.orderBy('createdAt', 'desc').limit(5).onSnapshot((snapshot) => {
+  const listEl = document.getElementById('timer-history-list');
+  if (!listEl) return;
+  
+  listEl.innerHTML = '';
+  snapshot.forEach((doc) => {
+    const item = doc.data();
+    const li = document.createElement('li');
+    li.textContent = `${item.action} przez ${item.user} (${item.time})`;
+    listEl.appendChild(li);
+  });
+});
+
+function updateUI() {
+  const btn = document.getElementById('timer-toggle-btn');
+  const infoEl = document.getElementById('timer-info');
+  
+  if (timerInterval) clearInterval(timerInterval);
+
+  if (currentTimerState.isRunning) {
+    if (btn) btn.textContent = '⏸ STOP (zatrzymaj)';
+    if (infoEl && currentTimerState.lastBy) {
+      infoEl.textContent = `Ostatnio uruchomione przez: ${currentTimerState.lastBy}`;
+    }
+    renderClock();
+    timerInterval = setInterval(renderClock, 1000);
+  } else {
+    if (btn) btn.textContent = '▶ START (wznów)';
+    if (infoEl && currentTimerState.lastBy) {
+      infoEl.textContent = `Ostatnio zatrzymane przez: ${currentTimerState.lastBy}`;
+    }
+    renderClock();
+  }
+}
+
+function renderClock() {
+  const clockEl = document.getElementById('love-clock');
+  if (!clockEl) return;
+
+  let totalMs = currentTimerState.accumulatedMs;
+
+  // Jeśli licznik bije, dodajemy czas od ostatniego kliknięcia START
+  if (currentTimerState.isRunning && currentTimerState.startTimestamp) {
+    totalMs += (Date.now() - currentTimerState.startTimestamp);
+  }
+
+  const days = Math.floor(totalMs / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((totalMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((totalMs % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((totalMs % (1000 * 60)) / 1000);
+
+  const headerText = currentTimerState.isRunning 
+    ? 'JESTEŚMY RAZEM (PONOWNIE) OD:' 
+    : 'BYLIŚMY RAZEM PRZEZ:';
+
+  clockEl.innerHTML =
+    `${headerText}<br>` +
+    `<span>${days} dni, ${hours}h ${minutes}m ${seconds}s</span> 💜`;
+}
+
+// Kliknięcie przycisku
+window.toggleTimer = function() {
+  window.saveUserName();
+  const select = document.getElementById('user-name-select');
+  const userName = select ? select.value : 'Damian';
+  const timeString = new Date().toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+
+  if (currentTimerState.isRunning) {
+    // ZATRZYMANIE: Obliczamy ile czasu upłynęło w tej sesji i dodajemy do accumulatedMs
+    const sessionTime = Date.now() - currentTimerState.startTimestamp;
+    const newAccumulated = currentTimerState.accumulatedMs + sessionTime;
+
+    timerDocRef.set({
+      isRunning: false,
+      startTimestamp: null,
+      accumulatedMs: newAccumulated,
+      lastBy: userName
+    });
+
+    historyColRef.add({
+      action: 'STOP',
+      user: userName,
+      time: timeString,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } else {
+// Funkcja do usuwania całej historii z Firestore
+window.clearHistory = function() {
+  if (confirm("Na pewno chcesz usunąć całą historię akcji?")) {
+    historyColRef.get().then((snapshot) => {
+      const batch = db.batch();
+      snapshot.docs.forEach((doc) => {
+        batch.delete(doc.ref);
+      });
+      return batch.commit();
+    }).then(() => {
+      console.log("Historia została wyczyszczona.");
+    }).catch((error) => {
+      console.error("Błąd podczas czyszczenia historii: ", error);
+    });
+  }
+};
+    // START / WZNOWIENIE: Zapisujemy obecny czas jako punkt startowy sesji
+    timerDocRef.set({
+      isRunning: true,
+      startTimestamp: Date.now(),
+      accumulatedMs: currentTimerState.accumulatedMs,
+      lastBy: userName
+    });
+
+    historyColRef.add({
+      action: 'START',
+      user: userName,
+      time: timeString,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }
+};
+
+initUserName();
 
     // ============================================================
     // CUSTOM CURSOR
@@ -2534,6 +2737,146 @@
       }, 300);
     };
   </script>
+<!-- SKRYPT LICZNIKA Z FIREBASE -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getDatabase, ref, set, push, query, limitToLast, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
+  // Jeśli masz już zainicjalizowany 'app' i 'db' wyżej w pliku, 
+  // skorzystaj z istniejącej zmiennej 'db'. 
+  // W przeciwnym razie upewnij się, że db wskazuje na Twoją bazę:
+  const db = getDatabase();
+
+  const timerRef = ref(db, 'timerState');
+  const historyRef = ref(db, 'timerHistory');
+
+  let currentTimerState = { isRunning: false, startTimestamp: null, lastBy: '' };
+  let timerInterval = null;
+
+  // Zapis i odczyt imienia z lokalnej pamięci
+  window.saveUserName = function() {
+    const select = document.getElementById('user-name-select');
+    if (select) {
+      localStorage.setItem('timer_user_name', select.value);
+    }
+  };
+
+  function initUserName() {
+    const savedName = localStorage.getItem('timer_user_name');
+    const select = document.getElementById('user-name-select');
+    if (savedName && select) {
+      select.value = savedName;
+    }
+  }
+
+  // Nasłuchiwanie stanu licznika w Firebase
+  onValue(timerRef, (snapshot) => {
+    const data = snapshot.val();
+    currentTimerState = data || { isRunning: false, startTimestamp: null, lastBy: '' };
+    updateUI();
+  });
+
+  // Nasłuchiwanie historii (ostatnie 5 wpisów)
+  const historyQuery = query(historyRef, limitToLast(5));
+  onValue(historyQuery, (snapshot) => {
+    const listEl = document.getElementById('timer-history-list');
+    if (!listEl) return;
+    
+    listEl.innerHTML = '';
+    const historyData = snapshot.val();
+    
+    if (historyData) {
+      const items = Object.values(historyData).reverse();
+      items.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = `${item.action} przez ${item.user} (${item.time})`;
+        listEl.appendChild(li);
+      });
+    }
+  });
+
+  function updateUI() {
+    const btn = document.getElementById('timer-toggle-btn');
+    const infoEl = document.getElementById('timer-info');
+    
+    if (timerInterval) clearInterval(timerInterval);
+
+    if (currentTimerState.isRunning) {
+      if (btn) btn.textContent = '⏸ STOP (zatrzymaj)';
+      if (infoEl && currentTimerState.lastBy) {
+        infoEl.textContent = `Ostatnio uruchomione przez: ${currentTimerState.lastBy}`;
+      }
+      renderClock();
+      timerInterval = setInterval(renderClock, 1000);
+    } else {
+      if (btn) btn.textContent = '▶ START (od dziś)';
+      if (infoEl && currentTimerState.lastBy) {
+        infoEl.textContent = `Ostatnio zatrzymane przez: ${currentTimerState.lastBy}`;
+      }
+      renderClock();
+    }
+  }
+
+  function renderClock() {
+    const clockEl = document.getElementById('love-clock');
+    if (!clockEl) return;
+
+    if (currentTimerState.isRunning && currentTimerState.startTimestamp) {
+      const now = Date.now();
+      const diff = now - currentTimerState.startTimestamp;
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      clockEl.innerHTML =
+        `JESTEŚMY RAZEM (PONOWNIE) OD:<br>` +
+        `<span>${days} dni, ${hours}h ${minutes}m ${seconds}s</span> 💜`;
+    } else {
+      clockEl.innerHTML =
+        `BYLIŚMY RAZEM PRZEZ:<br>` +
+        `<span>347 dni, 22h 0m 0s</span> 💜`;
+    }
+  }
+
+  // Akcja przycisku
+  window.toggleTimer = function() {
+    window.saveUserName();
+    const select = document.getElementById('user-name-select');
+    const userName = select ? select.value : 'Damian';
+    const timeString = new Date().toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+
+    if (currentTimerState.isRunning) {
+      set(timerRef, {
+        isRunning: false,
+        startTimestamp: null,
+        lastBy: userName
+      });
+
+      push(historyRef, {
+        action: 'STOP',
+        user: userName,
+        time: timeString
+      });
+    } else {
+      const newStart = Date.now();
+      set(timerRef, {
+        isRunning: true,
+        startTimestamp: newStart,
+        lastBy: userName
+      });
+
+      push(historyRef, {
+        action: 'START',
+        user: userName,
+        time: timeString
+      });
+    }
+  };
+
+  // Uruchomienie wyboru imienia
+  initUserName();
+</script>
 </body>
 </html>
